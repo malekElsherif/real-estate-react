@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Dialog,
   DialogTitle,
@@ -33,10 +32,10 @@ const UserActivityReportDialog = ({ id, open, onClose }: UserActivityReportProps
   const user = report?.user;
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      fullWidth 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
       maxWidth="md"
       aria-labelledby="user-activity-dialog-title"
     >
@@ -82,10 +81,10 @@ const UserActivityReportDialog = ({ id, open, onClose }: UserActivityReportProps
                     <p className="text-sm text-gray-500 mb-2">{user.email}</p>
                     <div className="flex items-center gap-2">
                       <Chip label={user.role} size="small" variant="outlined" />
-                      <Chip 
-                        label={user.isActive ? "Active" : "Inactive"} 
-                        size="small" 
-                        color={user.isActive ? "success" : "default"} 
+                      <Chip
+                        label={user.isActive ? "Active" : "Inactive"}
+                        size="small"
+                        color={user.isActive ? "success" : "default"}
                       />
                     </div>
                   </div>

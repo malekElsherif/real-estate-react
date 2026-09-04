@@ -25,14 +25,20 @@ const PropertyCard = ({ property }: { property: Property }) => {
     ? `${Number(property.price).toLocaleString()} EGP`
     : "Contact Agent";
 
-  const locationText = property.city || property.location || "Egypt";
+  const locationText =
+    property.city || property.location || "Egypt";
 
   const isUnavailable =
     property.status === "SOLD" ||
     property.status === "RENTED" ||
     property.status === "PENDING";
 
-  const badgeText = property.status === "SOLD" ? "SOLD" : property.status === "RENTED" ? "RENTED" : "PENDING";
+  const badgeText =
+    property.status === "SOLD"
+      ? "SOLD"
+      : property.status === "RENTED"
+        ? "RENTED"
+        : "PENDING";
 
   return (
     <div
@@ -45,8 +51,14 @@ const PropertyCard = ({ property }: { property: Property }) => {
       <div>
         {/* Image Container */}
         <div className="relative overflow-hidden border-b border-[#14213D]">
-          <div className={isUnavailable ? "filter blur-[2px] grayscale contrast-125" : ""}>
-            <Imgcard propertyId={property.id} />
+          <div
+            className={
+              isUnavailable
+                ? "filter blur-[2px] grayscale contrast-125"
+                : ""
+            }
+          >
+            <Imgcard propertyId={Number(property.id)} />
           </div>
 
           {property.type && (
@@ -73,19 +85,23 @@ const PropertyCard = ({ property }: { property: Property }) => {
 
         {/* Body Content */}
         <div className="space-y-3 p-5">
-          <p className={`${mono} text-[10px] uppercase tracking-widest text-[#B8863B]`}>
+          <p
+            className={`${mono} text-[10px] uppercase tracking-widest text-[#B8863B]`}
+          >
             📍 {locationText}
           </p>
 
           <h2
-            className={`${serif} text-lg font-semibold text-[#14213D] line-clamp-1 transition ${
+            className={`${serif} line-clamp-1 text-lg font-semibold text-[#14213D] transition ${
               !isUnavailable && "group-hover:text-[#B8863B]"
             }`}
           >
             {property.title}
           </h2>
 
-          <p className={`${mono} text-xs leading-relaxed text-[#4A5568] line-clamp-2`}>
+          <p
+            className={`${mono} line-clamp-2 text-xs leading-relaxed text-[#4A5568]`}
+          >
             {property.description}
           </p>
 
@@ -117,10 +133,15 @@ const PropertyCard = ({ property }: { property: Property }) => {
       {/* Footer Action Bar */}
       <div className="flex items-center justify-between border-t border-[#14213D] bg-[#F7F5EF] p-4">
         <div>
-          <span className={`${mono} text-[9px] uppercase tracking-wider text-[#4A5568]`}>
+          <span
+            className={`${mono} text-[9px] uppercase tracking-wider text-[#4A5568]`}
+          >
             Valuation
           </span>
-          <p className={`${serif} text-base font-bold text-[#14213D]`}>
+
+          <p
+            className={`${serif} text-base font-bold text-[#14213D]`}
+          >
             {price}
           </p>
         </div>
@@ -138,37 +159,54 @@ const PropertyCard = ({ property }: { property: Property }) => {
 };
 
 const Properties = () => {
-  const { data, isLoading, isError } = usegetallprop();
+  const {
+    data,
+    isLoading,
+    isError,
+  } = usegetallprop();
 
   // تفعيل التبويبات: "SALE" أو "RENT"
-  const [activeTab, setActiveTab] = useState<"SALE" | "RENT">("SALE");
+  const [activeTab, setActiveTab] =
+    useState<"SALE" | "RENT">("SALE");
+
   // فلتر إضافي لعرض الكل أو المتاح فقط داخل التبويب
   const [showAll, setShowAll] = useState(false);
 
-  const rawProperties: Property[] = useMemo(() => data?.data ?? [], [data]);
+  const rawProperties: Property[] = useMemo(
+    () => data?.data ?? [],
+    [data]
+  );
 
-  // 1. التصفية حسب النوع (SALE أو RENT) بناءً على حقل type في العقار
+  // 1. التصفية حسب النوع
   const tabFilteredProperties = useMemo(() => {
     return rawProperties.filter((property) => {
-      const propertyType = property.type?.toUpperCase() || "";
+      const propertyType =
+        property.type?.toUpperCase() || "";
+
       if (activeTab === "SALE") {
         return propertyType === "SALE";
-      } else {
-        return propertyType === "RENT";
       }
+
+      return propertyType === "RENT";
     });
   }, [rawProperties, activeTab]);
 
-  // 2. التصفية بناءً على حالة التوافر (المتاح فقط أو الكل)
+  // 2. التصفية حسب حالة التوافر
   const finalFilteredProperties = useMemo(() => {
-    if (showAll) return tabFilteredProperties;
-    return tabFilteredProperties.filter((property) => property.status === "AVAILABLE");
+    if (showAll) {
+      return tabFilteredProperties;
+    }
+
+    return tabFilteredProperties.filter(
+      (property) => property.status === "AVAILABLE"
+    );
   }, [tabFilteredProperties, showAll]);
 
   if (isLoading) {
     return (
       <div className="mx-auto max-w-7xl space-y-8 p-4">
         <div className="h-20 animate-pulse border-b border-[#14213D] bg-[#F7F5EF]" />
+
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
             <div
@@ -186,11 +224,18 @@ const Properties = () => {
       <div className="flex min-h-[60vh] items-center justify-center border border-[#B8452E] bg-[#FFFDF9] p-6 text-center">
         <div>
           <span className="text-2xl">⚠️</span>
-          <h2 className={`${serif} mt-2 text-lg font-semibold text-[#B8452E]`}>
+
+          <h2
+            className={`${serif} mt-2 text-lg font-semibold text-[#B8452E]`}
+          >
             Failed to load properties
           </h2>
-          <p className={`${mono} mt-1 text-xs text-[#4A5568]`}>
-            We couldn't retrieve the estate catalog. Please try again later.
+
+          <p
+            className={`${mono} mt-1 text-xs text-[#4A5568]`}
+          >
+            We couldn't retrieve the estate catalog. Please try
+            again later.
           </p>
         </div>
       </div>
@@ -202,18 +247,27 @@ const Properties = () => {
       {/* Header Section */}
       <div className="flex flex-col gap-6 border-b border-[#14213D] pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <span className={`${mono} text-[10px] uppercase tracking-[0.2em] text-[#B8863B]`}>
+          <span
+            className={`${mono} text-[10px] uppercase tracking-[0.2em] text-[#B8863B]`}
+          >
             Estate Collection
           </span>
-          <h1 className={`${serif} text-3xl font-semibold text-[#14213D]`}>
+
+          <h1
+            className={`${serif} text-3xl font-semibold text-[#14213D]`}
+          >
             Curated Properties
           </h1>
-          <p className={`${mono} mt-1 text-xs text-[#4A5568]`}>
-            Explore our exclusive collection categorized for sale and rent.
+
+          <p
+            className={`${mono} mt-1 text-xs text-[#4A5568]`}
+          >
+            Explore our exclusive collection categorized for sale
+            and rent.
           </p>
         </div>
 
-        {/* Tab Switcher (SALE / RENT) */}
+        {/* Tab Switcher */}
         <div className="flex border border-[#14213D] bg-[#EFEAE0]/50 p-1">
           <button
             onClick={() => setActiveTab("SALE")}
@@ -225,6 +279,7 @@ const Properties = () => {
           >
             For Sale
           </button>
+
           <button
             onClick={() => setActiveTab("RENT")}
             className={`${mono} px-5 py-2 text-xs font-bold uppercase tracking-wider transition ${
@@ -238,7 +293,7 @@ const Properties = () => {
         </div>
       </div>
 
-      {/* Sub-Header Controls (Filter Toggle & Count) */}
+      {/* Sub-Header Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         {/* Toggle Filter Button */}
         <button
@@ -247,17 +302,31 @@ const Properties = () => {
         >
           <span
             className={`h-2.5 w-2.5 rounded-full ${
-              showAll ? "bg-[#B8863B]" : "bg-[#14213D]"
+              showAll
+                ? "bg-[#B8863B]"
+                : "bg-[#14213D]"
             }`}
           />
-          {showAll ? `Showing All ${activeTab === "SALE" ? "Sale" : "Rental"} Properties` : "Showing Available Only"}
+
+          {showAll
+            ? `Showing All ${
+                activeTab === "SALE" ? "Sale" : "Rental"
+              } Properties`
+            : "Showing Available Only"}
         </button>
 
         <div className="border border-[#14213D] bg-[#F7F5EF] px-4 py-2 text-right">
-          <span className={`${mono} text-[10px] uppercase tracking-widest text-[#4A5568]`}>
-            {activeTab === "SALE" ? "Sale Listings" : "Rental Listings"}
+          <span
+            className={`${mono} text-[10px] uppercase tracking-widest text-[#4A5568]`}
+          >
+            {activeTab === "SALE"
+              ? "Sale Listings"
+              : "Rental Listings"}
           </span>
-          <p className={`${serif} text-lg font-bold text-[#14213D]`}>
+
+          <p
+            className={`${serif} text-lg font-bold text-[#14213D]`}
+          >
             {finalFilteredProperties.length}
           </p>
         </div>
@@ -268,18 +337,32 @@ const Properties = () => {
         <div className="flex min-h-[300px] items-center justify-center border border-dashed border-[#14213D] bg-[#FFFDF9] p-10 text-center">
           <div>
             <span className="text-3xl">🏛️</span>
-            <h2 className={`${serif} mt-3 text-xl font-medium text-[#14213D]`}>
-              No {activeTab === "SALE" ? "Sale" : "Rental"} Properties Found
+
+            <h2
+              className={`${serif} mt-3 text-xl font-medium text-[#14213D]`}
+            >
+              No{" "}
+              {activeTab === "SALE"
+                ? "Sale"
+                : "Rental"}{" "}
+              Properties Found
             </h2>
-            <p className={`${mono} mt-1 text-xs text-[#4A5568]`}>
-              There are currently no listings matching this criteria.
+
+            <p
+              className={`${mono} mt-1 text-xs text-[#4A5568]`}
+            >
+              There are currently no listings matching this
+              criteria.
             </p>
           </div>
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {finalFilteredProperties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
+            <PropertyCard
+              key={property.id}
+              property={property}
+            />
           ))}
         </div>
       )}

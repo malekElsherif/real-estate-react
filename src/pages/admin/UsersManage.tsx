@@ -15,7 +15,7 @@ const UsersManage = () => {
     isError,
     error,
     refetch,
-    isFetching,
+
   } = usegetallusers();
 
   const [activityUserId, setActivityUserId] = useState<number | null>(null);

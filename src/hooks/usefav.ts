@@ -1,4 +1,4 @@
-import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { addtofav, deletefav, getmyfav, isfav } from "../api/favourite";
 
 export const useaddtoFav = (id:number) => {

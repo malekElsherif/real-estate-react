@@ -1,6 +1,3 @@
-
-
-
 import './App.css'
 import AppRoutes from './routes/AppRoutes'
 import "bootstrap/dist/css/bootstrap.min.css";

@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import {
   Dialog,
@@ -22,7 +21,9 @@ type MyfavProps = {
 };
 
 const FontImports = () => (
-  <style>{`@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');`}</style>
+  <style>{`
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  `}</style>
 );
 
 const serif = "[font-family:'Fraunces',serif]";
@@ -30,22 +31,27 @@ const mono = "[font-family:'IBM_Plex_Mono',monospace]";
 
 const Myfav = ({ open, onClose }: MyfavProps) => {
   const { data: Data, isPending: loading, error } = usegetmyfav();
-  const data = Data?.data;
+
+  // AxiosResponse -> actual favorites array is inside Data.data
+  const data = Data?.data ?? [];
 
   return (
     <>
       <FontImports />
+
       <Dialog
         open={open}
         onClose={onClose}
         fullWidth
         maxWidth="md"
-        PaperProps={{
-          sx: {
-            backgroundColor: "#FFFDF9",
-            borderRadius: 0,
-            border: "1px solid #14213D",
-            boxShadow: "none",
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundColor: "#FFFDF9",
+              borderRadius: 0,
+              border: "1px solid #14213D",
+              boxShadow: "none",
+            },
           },
         }}
       >
@@ -61,10 +67,22 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
             py: 2,
           }}
         >
-          <Box display="flex" alignItems="center" gap={1.5}>
-            <FavoriteIcon sx={{ color: "#B8452E", fontSize: 22 }} />
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+            }}
+          >
+            <FavoriteIcon
+              sx={{
+                color: "#B8452E",
+                fontSize: 22,
+              }}
+            />
+
             <Typography
-              className={`${serif}`}
+              className={serif}
               variant="h6"
               sx={{
                 fontWeight: 600,
@@ -81,7 +99,9 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
             sx={{
               color: "#14213D",
               borderRadius: 0,
-              "&:hover": { backgroundColor: "#EFEAE0" },
+              "&:hover": {
+                backgroundColor: "#EFEAE0",
+              },
             }}
           >
             <CloseIcon fontSize="small" />
@@ -89,21 +109,39 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
         </DialogTitle>
 
         {/* Content */}
-        <DialogContent sx={{ p: 3, backgroundColor: "#FFFDF9" }}>
+        <DialogContent
+          sx={{
+            p: 3,
+            backgroundColor: "#FFFDF9",
+          }}
+        >
           {/* Loading */}
           {loading && (
             <Box
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-              py={8}
-              gap={2}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                py: 8,
+                gap: 2,
+              }}
             >
-              <CircularProgress size={32} sx={{ color: "#14213D" }} />
+              <CircularProgress
+                size={32}
+                sx={{
+                  color: "#14213D",
+                }}
+              />
+
               <Typography
-                className={`${mono}`}
-                sx={{ textTransform: "uppercase", fontSize: "0.75rem", tracking: "0.1em", color: "#4A5568" }}
+                className={mono}
+                sx={{
+                  textTransform: "uppercase",
+                  fontSize: "0.75rem",
+                  letterSpacing: "0.1em",
+                  color: "#4A5568",
+                }}
               >
                 Fetching saved listings...
               </Typography>
@@ -121,23 +159,35 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
               }}
             >
               <Typography
-                className={`${mono}`}
-                sx={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#B8452E" }}
+                className={mono}
+                sx={{
+                  fontSize: "0.75rem",
+                  textTransform: "uppercase",
+                  color: "#B8452E",
+                }}
               >
                 Error 02
               </Typography>
-              <Typography className={`${serif}`} sx={{ mt: 1, color: "#14213D", fontWeight: 500 }}>
+
+              <Typography
+                className={serif}
+                sx={{
+                  mt: 1,
+                  color: "#14213D",
+                  fontWeight: 500,
+                }}
+              >
                 Failed to load your favorite properties.
               </Typography>
             </Box>
           )}
 
           {/* Empty State */}
-          {!loading && !error && (!data || data.length === 0) && (
+          {!loading && !error && data.length === 0 && (
             <Box
-              textAlign="center"
-              py={8}
               sx={{
+                textAlign: "center",
+                py: 8,
                 border: "1px dashed #14213D",
                 px: 2,
               }}
@@ -149,8 +199,9 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
                   mb: 1.5,
                 }}
               />
+
               <Typography
-                className={`${serif}`}
+                className={serif}
                 variant="h6"
                 sx={{
                   fontWeight: 600,
@@ -159,28 +210,32 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
               >
                 No saved properties yet
               </Typography>
+
               <Typography
-                className={`${mono}`}
+                className={mono}
                 sx={{
                   mt: 1,
                   fontSize: "0.8rem",
                   color: "#4A5568",
                 }}
               >
-                Click the heart icon on any listing to bookmark properties for later.
+                Click the heart icon on any listing to bookmark properties for
+                later.
               </Typography>
             </Box>
           )}
 
           {/* Favorites Grid */}
-          {!loading && !error && data && data.length > 0 && (
+          {!loading && !error && data.length > 0 && (
             <Box
-              display="grid"
-              gridTemplateColumns={{
-                xs: "1fr",
-                sm: "repeat(2, 1fr)",
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(2, 1fr)",
+                },
+                gap: 3,
               }}
-              gap={3}
             >
               {data.map((favorite: any) => {
                 const property = favorite.property ?? favorite;
@@ -191,8 +246,9 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
                     className="relative flex flex-col border border-[#14213D] bg-[#FFFDF9]"
                   >
                     {/* Image Container */}
-                    <div className="relative h-44 border-b border-[#14213D] bg-[#EFEAE0] overflow-hidden">
-                      <Imgcard propertyId={property.id} />
+                    <div className="relative h-44 overflow-hidden border-b border-[#14213D] bg-[#EFEAE0]">
+                      <Imgcard propertyId={Number(property.id)} />
+
                       <span
                         className={`${mono} absolute right-3 top-3 z-10 border border-[#14213D] bg-[#FFFDF9] p-1 text-[#B8452E]`}
                       >
@@ -202,16 +258,26 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
 
                     {/* Content */}
                     <div className="flex flex-1 flex-col p-4">
-                      <h4 className={`${serif} text-lg font-semibold text-[#14213D] line-clamp-1`}>
+                      <h4
+                        className={`${serif} line-clamp-1 text-lg font-semibold text-[#14213D]`}
+                      >
                         {property.title}
                       </h4>
 
-                      <p className={`${mono} mt-1 text-xs text-[#4A5568] line-clamp-1`}>
-                        📍 {property.address || property.city || property.location || "Location specified"}
+                      <p
+                        className={`${mono} mt-1 line-clamp-1 text-xs text-[#4A5568]`}
+                      >
+                        📍{" "}
+                        {property.address ||
+                          property.city ||
+                          property.location ||
+                          "Location specified"}
                       </p>
 
                       <div className="mt-4 flex items-center justify-between border-t border-[#E4DFD3] pt-3">
-                        <span className={`${mono} text-base font-semibold text-[#B8863B]`}>
+                        <span
+                          className={`${mono} text-base font-semibold text-[#B8863B]`}
+                        >
                           {property.price?.toLocaleString()} EGP
                         </span>
 

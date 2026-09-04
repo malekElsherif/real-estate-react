@@ -1,4 +1,3 @@
-import React from "react";
 import { usegetme } from "../../hooks/useUsers";
 
 const serif = "[font-family:'Fraunces',serif]";

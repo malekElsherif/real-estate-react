@@ -44,7 +44,6 @@ import UsersManage from "../pages/admin/UsersManage";
 import ActiveUsers from "../pages/admin/ActiveUsers";
 import UserAdmin from "../pages/admin/User";
 import User from "../pages/profiles/user";
-import ProperiesAdmin from "../pages/admin/ProperiesAdmin";
 import Requests from "../pages/admin/Requests";
 import UserRequestHistory from "../pages/properties/UserRequestHistory";
 import About from "../pages/About";

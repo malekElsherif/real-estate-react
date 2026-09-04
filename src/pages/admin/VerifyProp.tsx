@@ -1,4 +1,3 @@
-import React from "react";
 import { Button } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAvailablityprop } from "../../hooks/useProp";

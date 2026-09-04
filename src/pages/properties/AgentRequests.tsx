@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { usegetPendingpurchaseRequests } from "../../hooks/usepurchase-requests";
-import ApprovePurchaseRequest from "./ApprovePurchaseRequest";
 
 const serif = "[font-family:'Fraunces',serif]";
 const mono = "[font-family:'IBM_Plex_Mono',monospace]";
@@ -101,10 +100,8 @@ const AgentRequest = () => {
                 )}
               </div>
 
-              {/* زر الأبروف */}
-              <div className="shrink-0 pt-2 sm:pt-0">
-                <ApprovePurchaseRequest id={request.id} />
-              </div>
+
+
             </div>
           ))}
         </div>

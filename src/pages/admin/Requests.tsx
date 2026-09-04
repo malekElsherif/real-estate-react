@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { usegetallpendingproperties } from "../../hooks/useProp";
 import AvailabilityProp from "./VerifyProp";
 import {
   usegetpendingagent,
-  useverifyagent,
-  userejectagent,
+
 } from "../../hooks/useadmin";
 import VerifyUnverifyAgent from "./VerifyUnverifyAgent";
 

@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Dialog,
   DialogTitle,
@@ -24,9 +23,12 @@ type MyfavProps = {
 const Myfav = ({ open, onClose }: MyfavProps) => {
   const {
     data,
-    isPending:isLoading,
+    isPending: isLoading,
     isError,
   } = usegetmyfav();
+
+  // data is AxiosResponse, so the actual array is inside data.data
+  const favorites = data?.data ?? [];
 
   return (
     <Dialog
@@ -45,9 +47,11 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
         }}
       >
         <Box
-          display="flex"
-          alignItems="center"
-          gap={1}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
         >
           <FavoriteIcon
             sx={{
@@ -84,10 +88,12 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
         {/* Loading */}
         {isLoading && (
           <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            minHeight={250}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: 250,
+            }}
           >
             <CircularProgress />
           </Box>
@@ -96,10 +102,12 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
         {/* Error */}
         {isError && (
           <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            minHeight={250}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: 250,
+            }}
           >
             <Typography
               color="error"
@@ -115,14 +123,16 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
         {/* Empty */}
         {!isLoading &&
           !isError &&
-          (!data || data.length === 0) && (
+          favorites.length === 0 && (
             <Box
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-              minHeight={250}
-              textAlign="center"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: 250,
+                textAlign: "center",
+              }}
             >
               <FavoriteIcon
                 sx={{
@@ -148,8 +158,7 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
                   mt: 1,
                 }}
               >
-                Properties you add to favorites will
-                appear here.
+                Properties you add to favorites will appear here.
               </Typography>
             </Box>
           )}
@@ -157,17 +166,18 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
         {/* Favorites */}
         {!isLoading &&
           !isError &&
-          data &&
-          data.length > 0 && (
+          favorites.length > 0 && (
             <Box
-              display="grid"
-              gridTemplateColumns={{
-                xs: "1fr",
-                sm: "repeat(2, 1fr)",
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(2, 1fr)",
+                },
+                gap: 2,
               }}
-              gap={2}
             >
-              {data.map((favorite: any) => {
+              {favorites.map((favorite: any) => {
                 const property =
                   favorite.property ?? favorite;
 
@@ -181,11 +191,9 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
                       borderRadius: 3,
                       boxShadow: 2,
                       overflow: "hidden",
-                      transition:
-                        "all 0.2s ease",
+                      transition: "all 0.2s ease",
                       "&:hover": {
-                        transform:
-                          "translateY(-3px)",
+                        transform: "translateY(-3px)",
                         boxShadow: 5,
                       },
                     }}
@@ -215,10 +223,10 @@ const Myfav = ({ open, onClose }: MyfavProps) => {
 
                       {/* Bottom */}
                       <Box
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="space-between"
                         sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
                           mt: 2,
                         }}
                       >

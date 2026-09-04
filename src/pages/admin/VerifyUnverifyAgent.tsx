@@ -1,4 +1,3 @@
-import React from "react";
 import { userejectagent, useverifyagent } from "../../hooks/useadmin";
 import { useQueryClient } from "@tanstack/react-query";
 
