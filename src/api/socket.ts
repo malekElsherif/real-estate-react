@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-export const socket = io("http://localhost:3001", {
+export const socket = io("https://real-estate-nest-production.up.railway.app", {
 
    autoConnect: false,
 });
