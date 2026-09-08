@@ -147,7 +147,7 @@ const Properties = () => {
     page: currentPage,
     limit: itemsPerPage,
     type: activeTab,
-    status: showAll ? undefined : "AVAILABLE", // 👈 تم التعديل: إرسال undefined لإحضار الكل أو AVAILABLE فقط
+    status: showAll ? undefined : "AVAILABLE",
   });
 
   const properties: Property[] = data?.data ?? [];
@@ -238,6 +238,7 @@ const Properties = () => {
         {/* Tab Switcher */}
         <div className="flex border border-[#14213D] bg-[#EFEAE0]/50 p-1">
           <button
+            type="button"
             onClick={() => setActiveTab("SALE")}
             className={`${mono} px-5 py-2 text-xs font-bold uppercase tracking-wider transition ${
               activeTab === "SALE"
@@ -249,6 +250,7 @@ const Properties = () => {
           </button>
 
           <button
+            type="button"
             onClick={() => setActiveTab("RENT")}
             className={`${mono} px-5 py-2 text-xs font-bold uppercase tracking-wider transition ${
               activeTab === "RENT"
@@ -264,6 +266,7 @@ const Properties = () => {
       {/* Sub-Header Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <button
+          type="button"
           onClick={() => setShowAll((prev) => !prev)}
           className={`${mono} flex items-center gap-2 border border-[#14213D] bg-[#FFFDF9] px-3.5 py-2 text-xs font-medium text-[#14213D] transition hover:bg-[#F7F5EF]`}
         >
@@ -322,6 +325,7 @@ const Properties = () => {
 
               <div className="flex items-center gap-2">
                 <button
+                  type="button"
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
                   className={`${mono} flex items-center gap-1.5 border border-[#14213D]/20 bg-[#FFFDF9] px-3.5 py-2 text-xs font-semibold text-[#14213D] transition-all hover:border-[#14213D] hover:bg-[#14213D] hover:text-[#FFFDF9] disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400`}
@@ -352,6 +356,7 @@ const Properties = () => {
                     return (
                       <button
                         key={pageNum}
+                        type="button"
                         onClick={() => handlePageChange(pageNum)}
                         className={`${mono} h-8 min-w-[32px] text-xs font-bold transition-all ${
                           isActive
@@ -366,6 +371,7 @@ const Properties = () => {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className={`${mono} flex items-center gap-1.5 border border-[#14213D]/20 bg-[#FFFDF9] px-3.5 py-2 text-xs font-semibold text-[#14213D] transition-all hover:border-[#14213D] hover:bg-[#14213D] hover:text-[#FFFDF9] disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400`}
