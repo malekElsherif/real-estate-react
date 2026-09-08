@@ -163,7 +163,7 @@ console.log(data)
               {/* Single Image */}
               <div className="group relative overflow-hidden border border-[#14213D] bg-[#14213D]">
                 <img
-                  src={`http://localhost:3001${currentImage?.url}`}
+                  src={`https://real-estate-nest-production.up.railway.app${currentImage?.url}`}
                   alt={data.title}
                   className="h-[450px] w-full object-cover transition duration-500 group-hover:scale-102"
                 />
