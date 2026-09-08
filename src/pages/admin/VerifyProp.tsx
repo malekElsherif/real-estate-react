@@ -1,11 +1,11 @@
 import { Button } from "@mui/material";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, type QueryKey } from "@tanstack/react-query";
 import { useAvailablityprop } from "../../hooks/useProp";
 
 type AvailabilityPropProps = {
   id: number;
   status: string;
-  queryKey: string;
+  queryKey?: QueryKey; // دعم كائن أو مصفوفة مفاتيح كاش بدلاً من String مجرد
 };
 
 const AvailabilityProp = ({
@@ -15,15 +15,16 @@ const AvailabilityProp = ({
 }: AvailabilityPropProps) => {
   const queryClient = useQueryClient();
 
-  const { mutate: changeAvailability, isPending } =
-    useAvailablityprop(id);
+  const { mutate: changeAvailability, isPending } = useAvailablityprop();
 
   const handleAvailability = () => {
-    changeAvailability(undefined, {
+    changeAvailability(id, {
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: [queryKey],
-        });
+        if (queryKey) {
+          queryClient.invalidateQueries({
+            queryKey: Array.isArray(queryKey) ? queryKey : [queryKey],
+          });
+        }
       },
     });
   };
@@ -39,7 +40,7 @@ const AvailabilityProp = ({
       variant="contained"
       color={isAvailable ? "warning" : "success"}
       onClick={handleAvailability}
-       disabled={isDisabled}
+      disabled={isDisabled}
       sx={{
         borderRadius: 2,
         textTransform: "none",
