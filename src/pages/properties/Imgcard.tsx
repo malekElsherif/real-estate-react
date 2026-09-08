@@ -24,14 +24,14 @@ const Imgcard = ({ propertyId }: ImgcardProps) => {
   }
 
   const images = data ?? [];
-  
+
 
 
   return (
     <div className="h-64 w-full overflow-hidden bg-slate-100">
       {images.length > 0 ? (
         <img
-          src={'http://localhost:3001' + images[0].url}
+          src={'https://real-estate-nest-production.up.railway.app' + images[0].url}
           alt="Property"
           className="h-full w-full object-cover"
         />
