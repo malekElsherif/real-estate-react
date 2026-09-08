@@ -13,16 +13,20 @@ export interface PropertyForm {
   area: number;
 }
 
-const Editproperity = () => {
-  const { id } = useParams<{ id: string }>();
+interface EditPropertyProps {
+  id?: number;
+  open?: boolean;
+  onClose?: () => void;
+}
+
+const Editproperity = ({ id: propId, open = true, onClose }: EditPropertyProps) => {
+  const { id: paramId } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // 1. تحويل الـ ID إلى رقم آمن
-  const propertyId = id ? Number(id) : 0;
+  // تحديد المعرف سواء تم تمريره كـ Prop أو تم قراءته من الـ URL
+  const propertyId = propId ?? (paramId ? Number(paramId) : 0);
 
-  // 2. يحل خطأ السطر 47: تمرير propertyId كـ number لـ usegetbyid
   const { data: propertyData, isLoading, isError } = usegetbyid(propertyId);
-
   const editPropMutation = useeditprop();
 
   const [formData, setFormData] = useState<Partial<PropertyForm>>({});
@@ -33,12 +37,19 @@ const Editproperity = () => {
     }
   }, [propertyData]);
 
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      navigate(-1);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!propertyId) return;
 
-    // 3. يحل خطأ السطر 88: إرسال كائن يحتوي على { id, data } بدلاً من formData فقط
     editPropMutation.mutate(
       {
         id: propertyId,
@@ -46,39 +57,70 @@ const Editproperity = () => {
       },
       {
         onSuccess: () => {
-          navigate("/properties");
+          handleClose();
         },
       }
     );
   };
 
-  if (isLoading) return <div className="p-6 text-center">Loading details...</div>;
-  if (isError || !propertyId)
-    return <div className="p-6 text-center text-red-600">Property not found!</div>;
+  if (!open) return null;
 
-  return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-6 space-y-4">
-      <h1 className="text-2xl font-bold">Edit Property</h1>
+  const formContent = (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <h1 className="text-2xl font-bold text-slate-800">Edit Property</h1>
 
-      <div>
-        <label className="block text-sm font-medium">Title</label>
-        <input
-          type="text"
-          value={formData.title || ""}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          className="w-full border p-2 rounded"
-        />
-      </div>
+      {isLoading ? (
+        <div className="p-6 text-center text-slate-500">Loading details...</div>
+      ) : isError || !propertyId ? (
+        <div className="p-6 text-center text-red-600">Property not found!</div>
+      ) : (
+        <>
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Title</label>
+            <input
+              type="text"
+              value={formData.title || ""}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="mt-1 w-full border border-slate-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
 
-      <button
-        type="submit"
-        disabled={editPropMutation.isPending}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-      >
-        {editPropMutation.isPending ? "Updating..." : "Save Changes"}
-      </button>
+          <div className="flex justify-end gap-3 pt-4">
+            {onClose && (
+              <button
+                type="button"
+                onClick={handleClose}
+                className="px-4 py-2 border border-slate-300 text-slate-600 rounded hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+            )}
+            <button
+              type="submit"
+              disabled={editPropMutation.isPending}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 font-medium"
+            >
+              {editPropMutation.isPending ? "Updating..." : "Save Changes"}
+            </button>
+          </div>
+        </>
+      )}
     </form>
   );
+
+  // إذا تم استخدامه كـ Modal/Dialog
+  if (onClose) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div className="w-full max-w-2xl rounded-xl bg-white p-6 shadow-xl">
+          {formContent}
+        </div>
+      </div>
+    );
+  }
+
+  // إذا تم استخدامه كصفحة مستقلة
+  return <div className="max-w-2xl mx-auto p-6">{formContent}</div>;
 };
 
 export default Editproperity;

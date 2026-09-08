@@ -200,7 +200,6 @@ const Myproperites = () => {
 
                     {/* Status stamp / Badge */}
                     {isSoldOrRented ? (
-                      /* ديف مائل مع تأثير البلور (Glassmorphism) للعقارات المباعة/المؤجرة */
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
                         <div className={`${mono} rotate-[-12deg] rounded-md border border-white/40 bg-black/40 px-6 py-2 text-sm font-bold uppercase tracking-widest text-white backdrop-blur-md shadow-2xl`}>
                           {isRent ? "Rented Out" : "Sold"}
@@ -301,7 +300,7 @@ const Myproperites = () => {
       {/* Edit Dialog */}
       {selectedPropertyId !== null && (
         <Editproperity
-          propertyId={selectedPropertyId}
+          id={selectedPropertyId}
           open={editOpen}
           onClose={handleCloseEdit}
         />
@@ -309,7 +308,5 @@ const Myproperites = () => {
     </div>
   );
 };
-
- // Fix syntax export structure if needed
 
 export default Myproperites;
