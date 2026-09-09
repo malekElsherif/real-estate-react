@@ -56,6 +56,7 @@ import AgentProfile from "../pages/agent/AgentProfile";
 import AddPropertyPage from "../pages/agent/Addproperity";
 import Chat from "../pages/chats/Chat";
 import ChatsList from "../pages/chats/ChatList";
+import AdminManageProps from "../pages/admin/AdminManageProps";
 
 const AppRoutes = () => {
   return (
@@ -217,6 +218,10 @@ const AppRoutes = () => {
           <Route
             path="dashboard/agents/pending"
             element={<PendeingAgents />}
+          />
+          <Route
+            path="dashboard/properties"
+            element={<AdminManageProps/>}
           />
 
           {/* =================================================
