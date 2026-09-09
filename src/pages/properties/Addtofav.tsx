@@ -49,7 +49,7 @@ const Addtofav = ({ id }: AddtofavProps) => {
           });
 
           queryClient.invalidateQueries({
-            queryKey: ["myfav"],
+            queryKey: ["getmyfav"],
           });
         },
       });
@@ -64,7 +64,7 @@ const Addtofav = ({ id }: AddtofavProps) => {
           });
 
           queryClient.invalidateQueries({
-            queryKey: ["myfav"],
+            queryKey: ["getmyfav"],
           });
         },
       });
