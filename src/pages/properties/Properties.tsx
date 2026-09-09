@@ -26,7 +26,19 @@ const PropertyCard = ({ property }: { property: Property }) => {
     : "Contact Agent";
 
   const locationText = property.city || property.location || "Egypt";
+
   const isUnavailable = property.status !== "AVAILABLE";
+
+  const getStatusLabel = () => {
+    switch (property.status) {
+      case "RENTED":
+        return "RENTED";
+      case "SOLD":
+        return "SOLD";
+      default:
+        return property.status;
+    }
+  };
 
   return (
     <div
@@ -60,7 +72,7 @@ const PropertyCard = ({ property }: { property: Property }) => {
                 <span
                   className={`${mono} text-sm font-bold tracking-[0.25em] text-[#FFFDF9] uppercase`}
                 >
-                  {property.status}
+                  {getStatusLabel()}
                 </span>
               </div>
             </div>
@@ -97,11 +109,12 @@ const PropertyCard = ({ property }: { property: Property }) => {
               </span>
             )}
 
-            {property.bathrooms !== undefined && property.bathrooms !== null && (
-              <span className="border border-[#E4DFD3] bg-[#F7F5EF] px-2.5 py-1 text-[11px]">
-                🛁 {property.bathrooms} Baths
-              </span>
-            )}
+            {property.bathrooms !== undefined &&
+              property.bathrooms !== null && (
+                <span className="border border-[#E4DFD3] bg-[#F7F5EF] px-2.5 py-1 text-[11px]">
+                  🛁 {property.bathrooms} Baths
+                </span>
+              )}
 
             {property.area !== undefined && property.area !== null && (
               <span className="border border-[#E4DFD3] bg-[#F7F5EF] px-2.5 py-1 text-[11px]">
@@ -139,7 +152,6 @@ const PropertyCard = ({ property }: { property: Property }) => {
 
 const Properties = () => {
   const [activeTab, setActiveTab] = useState<"SALE" | "RENT">("SALE");
-  const [showAll, setShowAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
@@ -147,16 +159,18 @@ const Properties = () => {
     page: currentPage,
     limit: itemsPerPage,
     type: activeTab,
-    status: showAll ? undefined : "AVAILABLE",
+    status: "AVAILABLE",
   });
 
   const properties: Property[] = data?.data ?? [];
-  const totalItems: number = data?.total ?? properties.length;
-  const totalPages: number = data?.totalPages ?? Math.ceil(totalItems / itemsPerPage);
+
+  const totalItems: number = properties.length;
+  const totalPages: number =
+    data?.totalPages ?? Math.ceil(totalItems / itemsPerPage);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab, showAll]);
+  }, [activeTab]);
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
@@ -177,10 +191,29 @@ const Properties = () => {
     }
 
     if (currentPage >= totalPages - 3) {
-      return [1, 2, 3, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+      return [
+        1,
+        2,
+        3,
+        "...",
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      ];
     }
 
-    return [1, 2, 3, "...", currentPage, "...", totalPages - 2, totalPages - 1, totalPages];
+    return [
+      1,
+      2,
+      3,
+      "...",
+      currentPage,
+      "...",
+      totalPages - 2,
+      totalPages - 1,
+      totalPages,
+    ];
   };
 
   if (isLoading) {
@@ -264,22 +297,7 @@ const Properties = () => {
       </div>
 
       {/* Sub-Header Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <button
-          type="button"
-          onClick={() => setShowAll((prev) => !prev)}
-          className={`${mono} flex items-center gap-2 border border-[#14213D] bg-[#FFFDF9] px-3.5 py-2 text-xs font-medium text-[#14213D] transition hover:bg-[#F7F5EF]`}
-        >
-          <span
-            className={`h-2.5 w-2.5 rounded-full transition-colors ${
-              showAll ? "bg-[#B8863B]" : "bg-emerald-600"
-            }`}
-          />
-          {showAll
-            ? `Showing All ${activeTab === "SALE" ? "Sale" : "Rental"} Properties`
-            : "Showing Available Only"}
-        </button>
-
+      <div className="flex items-center justify-end gap-4">
         <div className="border border-[#14213D] bg-[#F7F5EF] px-4 py-2 text-right">
           <span
             className={`${mono} text-[10px] uppercase tracking-widest text-[#4A5568]`}
@@ -318,9 +336,17 @@ const Properties = () => {
           {totalPages > 1 && (
             <div className="mt-12 flex flex-col items-center gap-4 border-t border-[#14213D]/10 pt-8 sm:flex-row sm:justify-between">
               <div className={`${mono} text-xs text-[#4A5568]`}>
-                Showing <span className="font-semibold text-[#14213D]">{startItem}</span> to{" "}
-                <span className="font-semibold text-[#14213D]">{endItem}</span> of{" "}
-                <span className="font-semibold text-[#14213D]">{totalItems}</span> Properties
+                Showing{" "}
+                <span className="font-semibold text-[#14213D]">
+                  {startItem}
+                </span>{" "}
+                to{" "}
+                <span className="font-semibold text-[#14213D]">{endItem}</span>{" "}
+                of{" "}
+                <span className="font-semibold text-[#14213D]">
+                  {totalItems}
+                </span>{" "}
+                Properties
               </div>
 
               <div className="flex items-center gap-2">
@@ -332,7 +358,11 @@ const Properties = () => {
                   title="Previous Page"
                 >
                   <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <path
+                      fillRule="evenodd"
+                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   <span>Prev</span>
                 </button>
@@ -379,7 +409,11 @@ const Properties = () => {
                 >
                   <span>Next</span>
                   <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </button>
               </div>
