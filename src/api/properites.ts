@@ -30,6 +30,11 @@ export const getbyuser = async (id: number) => {
   return res;
 };
 
+export const makePropertyAvailableUnavailable = async (id: number) => {
+  const res = await api.patch(`/properties/${id}/makePropertyAvailableUnavailable`);
+  return res.data;
+};
+
 export const editProp = async (id: number, data: any) => {
   const res = await api.patch(`/properties/${id}`, data);
   return res.data;
@@ -40,10 +45,7 @@ export const deleteProp = async (id: number) => {
   return res.data;
 };
 
-export const makePropertyAvailableUnavailable = async (id: number) => {
-  const res = await api.patch(`/properties/${id}/makePropertyAvailableUnavailable`);
-  return res.data;
-};
+
 
 export const getallpendingproperties = async () => {
   const res = await api.get("/properties/allpendingproperties");
