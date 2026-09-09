@@ -25,7 +25,7 @@ const Imgcard = ({ propertyId }: ImgcardProps) => {
       {" "}
       {images.length > 0 && images[0]?.url ? (
         <img
-          src={`http://localhost:3001${images[0].url}`}
+          src={`https://real-estate-nest-production.up.railway.app${images[0].url}`}
           alt="Property"
           className="h-full w-full object-cover"
           loading="lazy"
