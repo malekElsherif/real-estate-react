@@ -1,4 +1,4 @@
-import  { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { usegetme } from "../hooks/useUsers";
 import { usegetallprop } from "../hooks/useProp";
@@ -14,7 +14,11 @@ const mono = "[font-family:'IBM_Plex_Mono',monospace]";
 
 export const Home = () => {
   const { data: meData } = usegetme();
-  const { data: propertiesData, isLoading, isError } = usegetallprop();
+
+  // جلب البيانات مع فلترة المتاح فقط
+  const { data: propertiesData, isLoading, isError } = usegetallprop({
+    status: "AVAILABLE",
+  });
 
   const navigate = useNavigate();
 
@@ -24,17 +28,51 @@ export const Home = () => {
   const [listingStatus, setListingStatus] = useState("");
 
   const user = meData?.data;
-  const properties = propertiesData?.data ?? [];
+  const rawProperties = propertiesData?.data ?? [];
 
-  // إظهار المتاح أولاً في الصفحة الرئيسية، ثم اختيار أول 3 عقارات
-  const featuredProperties = useMemo(() => {
-    const available = properties.filter((p: any) => p.status === "AVAILABLE");
-    const unavailable = properties.filter((p: any) => p.status !== "AVAILABLE");
-    return [...available, ...unavailable].slice(0, 3);
-  }, [properties]);
+  // 1. فلترة العقارات المتاحة فقط (AVAILABLE) بجميع المعايير في السيرش
+  const filteredAvailableProperties = useMemo(() => {
+    if (!Array.isArray(rawProperties)) return [];
+
+    return rawProperties.filter((p: any) => {
+      // الشرط الأساسي: متاح فقط
+      if (p.status !== "AVAILABLE") return false;
+
+      // فلتر نص البحث (المدينة / العنوان / الموقع)
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const matchesTitle = p.title?.toLowerCase().includes(query);
+        const matchesCity = p.city?.toLowerCase().includes(query);
+        const matchesLocation = p.location?.toLowerCase().includes(query);
+
+        if (!matchesTitle && !matchesCity && !matchesLocation) {
+          return false;
+        }
+      }
+
+      // فلتر نوع العقار (APARTMENT, VILLA, etc.)
+      if (propertyType && p.type !== propertyType) {
+        return false;
+      }
+
+      // فلتر غرض العقار (SALE, RENT)
+      if (listingStatus && p.listingType !== listingStatus && p.type !== listingStatus) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [rawProperties, searchQuery, propertyType, listingStatus]);
+
+  // 2. إذا كان المستخدم يبحث نعرض النتائج المفلترة كاملة، وإلا نعرض أول 3 عقارات متاحة فقط
+  const displayProperties = useMemo(() => {
+    const isSearching = Boolean(searchQuery || propertyType || listingStatus);
+    return isSearching ? filteredAvailableProperties : filteredAvailableProperties.slice(0, 3);
+  }, [filteredAvailableProperties, searchQuery, propertyType, listingStatus]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    // تحويل المستخدم لصفحة العقارات مع الفلاتر عند الضغط على Search
     const params = new URLSearchParams();
     if (searchQuery) params.append("search", searchQuery);
     if (propertyType) params.append("type", propertyType);
@@ -141,7 +179,7 @@ export const Home = () => {
         <div className="grid grid-cols-2 gap-6 border border-[#14213D] bg-[#FFFDF9] p-8 md:grid-cols-4 md:divide-x md:divide-[#E4DFD3] md:gap-0">
           <div className="text-center md:px-4">
             <h2 className={`${serif} text-3xl font-semibold text-[#14213D] sm:text-4xl`}>
-              {properties.length}+
+              {filteredAvailableProperties.length}+
             </h2>
             <p className={`${mono} mt-1 text-[11px] uppercase tracking-widest text-[#4A5568]`}>
               Active Listings
@@ -174,15 +212,15 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* ================= FEATURED PROPERTIES ================= */}
+      {/* ================= FEATURED / SEARCH RESULTS ================= */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between border-b border-[#14213D] pb-6">
           <div>
             <span className={`${mono} text-xs uppercase tracking-[0.25em] text-[#B8863B]`}>
-              Featured Selection
+              {searchQuery || propertyType || listingStatus ? "Search Results" : "Featured Selection"}
             </span>
             <h2 className={`${serif} mt-1 text-3xl font-semibold text-[#14213D] sm:text-4xl`}>
-              Latest Listings
+              {searchQuery || propertyType || listingStatus ? "Matching Properties" : "Latest Listings"}
             </h2>
             <p className="mt-2 text-sm text-[#4A5568]">
               Handpicked properties available for sale and rent under management.
@@ -218,7 +256,7 @@ export const Home = () => {
           </div>
         )}
 
-        {!isLoading && !isError && featuredProperties.length === 0 && (
+        {!isLoading && !isError && displayProperties.length === 0 && (
           <div className="mt-10 flex flex-col items-center border border-dashed border-[#14213D] bg-[#FFFDF9] p-12 text-center">
             <h3 className={`${serif} text-2xl font-medium text-[#14213D]`}>
               No properties available
@@ -230,19 +268,11 @@ export const Home = () => {
         )}
 
         {/* Grid */}
-        {!isLoading && !isError && featuredProperties.length > 0 && (
+        {!isLoading && !isError && displayProperties.length > 0 && (
           <div className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {featuredProperties.map((property: any) => {
-              const isRent = property.type === "RENT";
-
-              // إصلاح فحص حالة الإتاحة الصحيح
-              const isUnavailable =
-                property.status === "SOLD" ||
-                property.status === "RENTED" ||
-                property.status === "PENDING";
-
-              const stampColorClass = isRent ? "text-[#5B7B65]" : "text-[#B8452E]";
-              const badgeText = property.status === "SOLD" ? "Sold" : "Rented";
+            {displayProperties.map((property: any) => {
+              const isRent = property.listingType === "RENT" || property.type === "RENT";
+              const stampColorClass = isRent ? "text-[#5B7B65]" : "text-[#B8863B]";
 
               return (
                 <div
@@ -255,9 +285,7 @@ export const Home = () => {
 
                   {/* Image Container */}
                   <div className="relative h-56 border-b border-[#14213D] bg-[#EFEAE0] overflow-hidden">
-                    <div className={isUnavailable ? "filter blur-[2px] grayscale contrast-125" : ""}>
-                      <Imgcard propertyId={property.id} />
-                    </div>
+                    <Imgcard propertyId={property.id} />
 
                     {/* Status Stamp (Sale / Rent) */}
                     <span
@@ -265,17 +293,6 @@ export const Home = () => {
                     >
                       {isRent ? "For Rent" : "For Sale"}
                     </span>
-
-                    {/* Sold / Rented Badge Overlay */}
-                    {isUnavailable && (
-                      <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#14213D]/40 backdrop-blur-[1px]">
-                        <span
-                          className={`${mono} -rotate-12 border-2 border-[#FFFDF9] bg-[#B8452E] px-4 py-1.5 text-sm font-bold uppercase tracking-widest text-[#FFFDF9] shadow-lg`}
-                        >
-                          {badgeText}
-                        </span>
-                      </div>
-                    )}
 
                     {/* City Name Badge on Image */}
                     <div className="absolute bottom-3 left-4 z-10 border border-[#14213D]/20 bg-[#14213D]/85 px-2.5 py-1 backdrop-blur-sm">
@@ -378,8 +395,6 @@ export const Home = () => {
           </div>
         </div>
       </section>
-
-
     </div>
   );
 };
