@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { usegetme } from "../hooks/useUsers";
 import { usegetallprop } from "../hooks/useProp";
@@ -15,78 +15,32 @@ const mono = "[font-family:'IBM_Plex_Mono',monospace]";
 export const Home = () => {
   const { data: meData } = usegetme();
 
-  // جلب البيانات مع فلترة المتاح فقط
+  // جلب البيانات المتاحة فقط
   const { data: propertiesData, isLoading, isError } = usegetallprop({
     status: "AVAILABLE",
   });
 
   const navigate = useNavigate();
-
-  // Search Filter State
-  const [searchQuery, setSearchQuery] = useState("");
-  const [propertyType, setPropertyType] = useState("");
-  const [listingStatus, setListingStatus] = useState("");
-
   const user = meData?.data;
   const rawProperties = propertiesData?.data ?? [];
 
-  // 1. فلترة العقارات المتاحة فقط (AVAILABLE) بجميع المعايير في السيرش
-  const filteredAvailableProperties = useMemo(() => {
+  // فلترة العقارات المتاحة فقط
+  const availableProperties = useMemo(() => {
     if (!Array.isArray(rawProperties)) return [];
+    return rawProperties.filter((p: any) => p.status === "AVAILABLE");
+  }, [rawProperties]);
 
-    return rawProperties.filter((p: any) => {
-      // الشرط الأساسي: متاح فقط
-      if (p.status !== "AVAILABLE") return false;
-
-      // فلتر نص البحث (المدينة / العنوان / الموقع)
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        const matchesTitle = p.title?.toLowerCase().includes(query);
-        const matchesCity = p.city?.toLowerCase().includes(query);
-        const matchesLocation = p.location?.toLowerCase().includes(query);
-
-        if (!matchesTitle && !matchesCity && !matchesLocation) {
-          return false;
-        }
-      }
-
-      // فلتر نوع العقار (APARTMENT, VILLA, etc.)
-      if (propertyType && p.type !== propertyType) {
-        return false;
-      }
-
-      // فلتر غرض العقار (SALE, RENT)
-      if (listingStatus && p.listingType !== listingStatus && p.type !== listingStatus) {
-        return false;
-      }
-
-      return true;
-    });
-  }, [rawProperties, searchQuery, propertyType, listingStatus]);
-
-  // 2. إذا كان المستخدم يبحث نعرض النتائج المفلترة كاملة، وإلا نعرض أول 3 عقارات متاحة فقط
+  // عرض أول 3 عقارات فقط كـ Featured
   const displayProperties = useMemo(() => {
-    const isSearching = Boolean(searchQuery || propertyType || listingStatus);
-    return isSearching ? filteredAvailableProperties : filteredAvailableProperties.slice(0, 3);
-  }, [filteredAvailableProperties, searchQuery, propertyType, listingStatus]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // تحويل المستخدم لصفحة العقارات مع الفلاتر عند الضغط على Search
-    const params = new URLSearchParams();
-    if (searchQuery) params.append("search", searchQuery);
-    if (propertyType) params.append("type", propertyType);
-    if (listingStatus) params.append("status", listingStatus);
-
-    navigate(`/properties?${params.toString()}`);
-  };
+    return availableProperties.slice(0, 3);
+  }, [availableProperties]);
 
   return (
     <div className="min-h-screen bg-[#FFFDF9] text-[#14213D] antialiased">
       <FontImports />
 
       {/* ================= HERO SECTION ================= */}
-      <section className="relative min-h-[640px] border-b border-[#14213D] bg-[#14213D] text-[#F7F5EF]">
+      <section className="relative min-h-[580px] border-b border-[#14213D] bg-[#14213D] text-[#F7F5EF]">
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
@@ -113,64 +67,24 @@ export const Home = () => {
             Explore premium architectural houses, modern apartments, and luxury villas across Egypt. Verified listings under trusted management.
           </p>
 
-          {/* Search Form */}
-          <form
-            onSubmit={handleSearch}
-            className="mt-10 w-full max-w-4xl border border-[#14213D] bg-[#FFFDF9] p-4 shadow-xl sm:p-6"
-          >
-            <div className="flex flex-col gap-3 md:flex-row md:items-center">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search city, neighborhood, or title..."
-                  className={`${mono} w-full border border-[#E4DFD3] bg-[#FFFDF9] px-4 py-3 text-xs text-[#14213D] placeholder-[#4A5568] outline-none transition focus:border-[#14213D]`}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 md:w-2/5">
-                <select
-                  value={propertyType}
-                  onChange={(e) => setPropertyType(e.target.value)}
-                  className={`${mono} w-full border border-[#E4DFD3] bg-[#FFFDF9] px-3 py-3 text-xs text-[#14213D] outline-none transition focus:border-[#14213D]`}
-                >
-                  <option value="">Type: All</option>
-                  <option value="APARTMENT">Apartment</option>
-                  <option value="VILLA">Villa</option>
-                  <option value="HOUSE">House</option>
-                  <option value="OFFICE">Office</option>
-                </select>
-
-                <select
-                  value={listingStatus}
-                  onChange={(e) => setListingStatus(e.target.value)}
-                  className={`${mono} w-full border border-[#E4DFD3] bg-[#FFFDF9] px-3 py-3 text-xs text-[#14213D] outline-none transition focus:border-[#14213D]`}
-                >
-                  <option value="">Status: All</option>
-                  <option value="SALE">For Sale</option>
-                  <option value="RENT">For Rent</option>
-                </select>
-              </div>
-
-              <button
-                type="submit"
-                className={`${mono} bg-[#14213D] px-8 py-3 text-xs font-semibold uppercase tracking-wider text-[#F7F5EF] transition-colors duration-150 hover:bg-[#B8863B]`}
-              >
-                Search
-              </button>
-            </div>
-          </form>
-
-          {/* Quick Agent CTA */}
-          {user?.role === "AGENT" && (
-            <button
-              onClick={() => navigate("/agent/dashboard")}
-              className={`${mono} mt-6 inline-flex items-center gap-2 border border-[#B8863B] bg-transparent px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#F7F5EF] transition-colors duration-150 hover:bg-[#B8863B]`}
+          {/* Action Buttons */}
+          <div className={`${mono} mt-10 flex flex-wrap items-center justify-center gap-4`}>
+            <Link
+              to="/properties"
+              className="bg-[#B8863B] px-8 py-3.5 text-xs font-semibold uppercase tracking-wider text-[#F7F5EF] transition-colors duration-150 hover:bg-[#a07330]"
             >
-              Go to Agent Dashboard →
-            </button>
-          )}
+              Explore Properties →
+            </Link>
+
+            {user?.role === "AGENT" && (
+              <button
+                onClick={() => navigate("/agent/dashboard")}
+                className="border border-[#B8863B] bg-transparent px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-[#F7F5EF] transition-colors duration-150 hover:bg-[#B8863B]"
+              >
+                Go to Agent Dashboard
+              </button>
+            )}
+          </div>
         </div>
       </section>
 
@@ -179,7 +93,7 @@ export const Home = () => {
         <div className="grid grid-cols-2 gap-6 border border-[#14213D] bg-[#FFFDF9] p-8 md:grid-cols-4 md:divide-x md:divide-[#E4DFD3] md:gap-0">
           <div className="text-center md:px-4">
             <h2 className={`${serif} text-3xl font-semibold text-[#14213D] sm:text-4xl`}>
-              {filteredAvailableProperties.length}+
+              {availableProperties.length}+
             </h2>
             <p className={`${mono} mt-1 text-[11px] uppercase tracking-widest text-[#4A5568]`}>
               Active Listings
@@ -212,15 +126,15 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* ================= FEATURED / SEARCH RESULTS ================= */}
+      {/* ================= FEATURED SELECTION ================= */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between border-b border-[#14213D] pb-6">
           <div>
             <span className={`${mono} text-xs uppercase tracking-[0.25em] text-[#B8863B]`}>
-              {searchQuery || propertyType || listingStatus ? "Search Results" : "Featured Selection"}
+              Featured Selection
             </span>
             <h2 className={`${serif} mt-1 text-3xl font-semibold text-[#14213D] sm:text-4xl`}>
-              {searchQuery || propertyType || listingStatus ? "Matching Properties" : "Latest Listings"}
+              Latest Listings
             </h2>
             <p className="mt-2 text-sm text-[#4A5568]">
               Handpicked properties available for sale and rent under management.
@@ -284,7 +198,7 @@ export const Home = () => {
                   <span className="pointer-events-none absolute -right-px -top-px h-2.5 w-2.5 border-r-[1.5px] border-t-[1.5px] border-[#14213D]" />
 
                   {/* Image Container */}
-                  <div className="relative h-56 border-b border-[#14213D] bg-[#EFEAE0] overflow-hidden">
+                  <div className="relative h-56 overflow-hidden border-b border-[#14213D] bg-[#EFEAE0]">
                     <Imgcard propertyId={property.id} />
 
                     {/* Status Stamp (Sale / Rent) */}
