@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://real-estate-nest-production.up.railway.app",
+  baseURL: "https://real-estate-nest.vercel.app"
+
 });
 
 let isLoggingOut = false;
