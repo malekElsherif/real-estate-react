@@ -24,6 +24,17 @@ export const Home = () => {
   const user = meData?.data;
   const rawProperties = propertiesData?.data ?? [];
 
+  // زر الداشبورد حسب نوع المستخدم (ADMIN أو AGENT فقط)
+  const dashboardPath =
+    user?.role === "ADMIN"
+      ? "/admin/dashboard"
+      : user?.role === "AGENT"
+      ? "/agent/dashboard"
+      : null;
+
+  const dashboardLabel =
+    user?.role === "ADMIN" ? "Go to Admin Dashboard" : "Go to Agent Dashboard";
+
   // فلترة العقارات المتاحة فقط
   const availableProperties = useMemo(() => {
     if (!Array.isArray(rawProperties)) return [];
@@ -76,12 +87,12 @@ export const Home = () => {
               Explore Properties →
             </Link>
 
-            {user?.role === "AGENT" && (
+            {dashboardPath && (
               <button
-                onClick={() => navigate("/agent/dashboard")}
+                onClick={() => navigate(dashboardPath)}
                 className="border border-[#B8863B] bg-transparent px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-[#F7F5EF] transition-colors duration-150 hover:bg-[#B8863B]"
               >
-                Go to Agent Dashboard
+                {dashboardLabel}
               </button>
             )}
           </div>

@@ -105,8 +105,8 @@ export const useUpdatePropStatus = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, status }: { id: number | string; status: string }) =>
-      editProp(Number(id), { status }),
+    mutationFn: ({ id }: { id: number | string; status: string }) =>
+      makePropertyAvailableUnavailable(Number(id)),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["properties", Number(variables.id)] });
       queryClient.invalidateQueries({ queryKey: ["properties"] });

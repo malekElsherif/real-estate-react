@@ -4,6 +4,7 @@ import {
   useverifyagent,
   userejectagent,
 } from "../../hooks/useadmin";
+import { btnDanger, btnPadSm, btnSuccess } from "./adminBrand";
 
 type PendingAgentActionsProps = {
   id: number;
@@ -60,7 +61,7 @@ const PendingAgentActions = ({
         type="button"
         onClick={handleVerify}
         disabled={isPending}
-        className="rounded-lg bg-green-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className={`${btnPadSm} ${btnSuccess}`}
       >
         {isVerifying ? "Verifying..." : "Verify"}
       </button>
@@ -69,7 +70,7 @@ const PendingAgentActions = ({
         type="button"
         onClick={handleReject}
         disabled={isPending}
-        className="rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className={`${btnPadSm} ${btnDanger}`}
       >
         {isRejecting ? "Rejecting..." : "Reject"}
       </button>
@@ -86,108 +87,83 @@ const PendeingAgents = () => {
 
   if (isLoading) {
     return (
-      <div className="p-6">
-        Loading...
+      <div className="flex min-h-[300px] flex-col items-center justify-center gap-3">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#E4DFD3] border-t-[#B8863B]" />
+        <p className="eyebrow text-[#14213D]/60">Loading pending agents</p>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="p-6 text-red-500">
-        Failed to load pending agents
+      <div className="m-6 border border-[#B8452E] bg-[#FFFDF9] p-8 text-center">
+        <p className="eyebrow text-[#B8452E]">Error</p>
+        <p className="font-heading mt-2 text-lg font-semibold text-[#14213D]">
+          Failed to load pending agents
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
+    <div className="mx-auto max-w-7xl">
+      <div className="mb-8">
+        <p className="eyebrow text-[#B8863B]">Verification Queue</p>
 
-      <h1 className="mb-6 text-2xl font-bold text-slate-800">
-        Pending Agents
-      </h1>
+        <h1 className="font-heading mt-2 text-3xl font-semibold text-[#14213D] sm:text-4xl">
+          Pending Agents
+        </h1>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="mt-4 h-px w-16 bg-[#B8863B]" />
+      </div>
 
-        <table className="w-full text-left">
-
-          <thead className="border-b bg-slate-50">
-            <tr>
-              <th className="px-6 py-4">ID</th>
-
-              <th className="px-6 py-4">
-                Name
-              </th>
-
-              <th className="px-6 py-4">
-                Email
-              </th>
-
-              <th className="px-6 py-4">
-                Role
-              </th>
-
-              <th className="px-6 py-4">
-                Active
-              </th>
-
-              <th className="px-6 py-4">
-                Status
-              </th>
-
-              <th className="px-6 py-4">
-                Actions
-              </th>
+      <div className="overflow-x-auto border border-[#14213D] bg-[#FFFDF9]">
+        <table className="w-full text-left text-xs">
+          <thead>
+            <tr className="eyebrow bg-[#14213D] text-[#FFFDF9]">
+              <th className="px-6 py-4 font-semibold">ID</th>
+              <th className="px-6 py-4 font-semibold">Name</th>
+              <th className="px-6 py-4 font-semibold">Email</th>
+              <th className="px-6 py-4 font-semibold">Role</th>
+              <th className="px-6 py-4 font-semibold">Active</th>
+              <th className="px-6 py-4 font-semibold">Status</th>
+              <th className="px-6 py-4 font-semibold">Actions</th>
             </tr>
           </thead>
 
-          <tbody>
-
+          <tbody className="divide-y divide-[#E4DFD3]">
             {data?.data?.map((agent: any) => (
               <tr
                 key={agent.id}
-                className="border-b last:border-b-0 hover:bg-slate-50"
+                className="transition-colors hover:bg-[#EFEAE0]/30"
               >
+                <td className="px-6 py-4 text-[#14213D]/60">#{agent.id}</td>
 
-                <td className="px-6 py-4">
-                  {agent.id}
-                </td>
-
-                <td className="px-6 py-4 font-medium">
+                <td className="px-6 py-4 text-sm font-semibold text-[#14213D]">
                   {agent.name}
                 </td>
 
-                <td className="px-6 py-4 text-slate-600">
-                  {agent.email}
-                </td>
+                <td className="px-6 py-4 text-[#4A5568]">{agent.email}</td>
 
-                <td className="px-6 py-4">
-                  {agent.role}
-                </td>
+                <td className="px-6 py-4">{agent.role}</td>
 
                 <td className="px-6 py-4">
                   {agent.isActive ? "Yes" : "No"}
                 </td>
 
                 <td className="px-6 py-4">
-                  <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-700">
+                  <span className="eyebrow inline-block border border-[#B8863B] bg-[#B8863B]/10 px-2.5 py-1 font-semibold text-[#B8863B]">
                     {agent.verificationStatus}
                   </span>
                 </td>
 
                 <td className="px-6 py-4">
-                  <PendingAgentActions
-                    id={agent.id}
-                  />
+                  <PendingAgentActions id={agent.id} />
                 </td>
-
               </tr>
             ))}
-
           </tbody>
-
         </table>
-
       </div>
     </div>
   );

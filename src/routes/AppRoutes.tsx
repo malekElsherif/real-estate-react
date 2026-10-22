@@ -57,6 +57,7 @@ import AddPropertyPage from "../pages/agent/Addproperity";
 import Chat from "../pages/chats/Chat";
 import ChatsList from "../pages/chats/ChatList";
 import AdminManageProps from "../pages/admin/AdminManageProps";
+import Settings from "../pages/admin/Settings";
 
 const AppRoutes = () => {
   return (
@@ -201,10 +202,13 @@ const AppRoutes = () => {
         >
           {/* /admin */}
 
+
           <Route
             index
             element={<MainAdminDash />}
           />
+
+
 
           {/* /admin/dashboard */}
 
@@ -214,6 +218,11 @@ const AppRoutes = () => {
           />
 
           {/* /admin/dashboard/agents/pending */}
+
+          <Route
+            path="dashboard/settings"
+            element={<Settings />}
+/>
 
           <Route
             path="dashboard/agents/pending"

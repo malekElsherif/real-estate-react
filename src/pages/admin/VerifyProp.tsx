@@ -35,18 +35,33 @@ const AvailabilityProp = ({
     isPending ||
     (status !== "AVAILABLE" && status !== "PENDING");
 
+  // Available -> gold (take down) | Not available -> green (publish)
+  const base = isAvailable ? "#B8863B" : "#5B7B65";
+  const hover = isAvailable ? "#a37632" : "#4a6652";
+
   return (
     <Button
       variant="contained"
-      color={isAvailable ? "warning" : "success"}
       onClick={handleAvailability}
       disabled={isDisabled}
+      disableElevation
       sx={{
-        borderRadius: 2,
-        textTransform: "none",
-        fontWeight: 700,
+        borderRadius: 0,
+        textTransform: "uppercase",
+        fontFamily: "'IBM Plex Mono', ui-monospace, monospace",
+        fontWeight: 600,
+        fontSize: "0.65rem",
+        letterSpacing: "0.14em",
         boxShadow: "none",
         minWidth: 145,
+        bgcolor: base,
+        color: "#FFFDF9",
+        "&:hover": { bgcolor: hover, boxShadow: "none" },
+        "&.Mui-disabled": {
+          bgcolor: base,
+          color: "#FFFDF9",
+          opacity: 0.5,
+        },
       }}
     >
       {isPending

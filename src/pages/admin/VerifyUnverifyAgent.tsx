@@ -1,5 +1,6 @@
 import { userejectagent, useverifyagent } from "../../hooks/useadmin";
 import { useQueryClient } from "@tanstack/react-query";
+import { btnDanger, btnPad, btnSuccess } from "./adminBrand";
 
 type VerifyUnverifyAgentProps = {
   id: number;
@@ -43,12 +44,12 @@ const VerifyUnverifyAgent = ({
   };
 
   return (
-    <div className="flex gap-3">
+    <div className="flex w-full gap-3">
       <button
         type="button"
         onClick={handleVerify}
         disabled={isLoading}
-        className="flex-1 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className={`flex-1 ${btnPad} ${btnSuccess}`}
       >
         {isVerifying ? "Verifying..." : "Verify"}
       </button>
@@ -57,7 +58,7 @@ const VerifyUnverifyAgent = ({
         type="button"
         onClick={handleReject}
         disabled={isLoading}
-        className="flex-1 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className={`flex-1 ${btnPad} ${btnDanger}`}
       >
         {isRejecting ? "Rejecting..." : "Reject"}
       </button>

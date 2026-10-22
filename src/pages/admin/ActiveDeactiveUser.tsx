@@ -3,6 +3,7 @@ import {
   usedeactiveuser,
 } from "../../hooks/useadmin";
 import { useQueryClient } from "@tanstack/react-query";
+import { btnDanger, btnPadSm, btnSuccess } from "./adminBrand";
 
 type ActiveDeactiveUserProps = {
   id: number;
@@ -63,11 +64,7 @@ const ActiveDeactiveUser = ({
         type="button"
         onClick={handleClick}
         disabled={isPending}
-        className={`rounded-lg px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50 ${
-          isActive
-            ? "bg-red-600 hover:bg-red-700"
-            : "bg-green-600 hover:bg-green-700"
-        }`}
+        className={`${btnPadSm} ${isActive ? btnDanger : btnSuccess}`}
       >
         {isPending
           ? isActive
@@ -79,13 +76,13 @@ const ActiveDeactiveUser = ({
       </button>
 
       {activeisError && !isActive && (
-        <p className="mt-1 text-xs text-red-500">
+        <p className="font-data mt-1 text-[10px] text-[#B8452E]">
           Failed to activate user
         </p>
       )}
 
       {deactiveisError && isActive && (
-        <p className="mt-1 text-xs text-red-500">
+        <p className="font-data mt-1 text-[10px] text-[#B8452E]">
           Failed to deactivate user
         </p>
       )}
