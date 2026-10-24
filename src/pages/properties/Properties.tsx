@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { usegetallprop } from "../../hooks/useProp";
+import { useLogViewedProperty, useGetViewedPropertiesByUser } from "../../hooks/useviewProp";
+import { usegetme } from "../../hooks/useUsers"; // 1. استيراد هوك المستخدم الحالي
 import Imgcard from "./Imgcard";
 
 export interface Property {
@@ -20,7 +22,38 @@ export interface Property {
 const serif = "[font-family:'Fraunces',serif]";
 const mono = "[font-family:'IBM_Plex_Mono',monospace]";
 
-const PropertyCard = ({ property }: { property: Property }) => {
+const EyeIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+interface PropertyCardProps {
+  property: Property;
+  isViewed: boolean;
+}
+
+const PropertyCard = ({ property, isViewed }: PropertyCardProps) => {
+  const { mutate: logView } = useLogViewedProperty();
+
+  const handleDetailsClick = () => {
+    logView(Number(property.id), {
+      onError: () => {
+        // تجاهل الخطأ في حال عدم تسجيل الدخول
+      },
+    });
+  };
+
   const price = property.price
     ? `${Number(property.price).toLocaleString()} EGP`
     : "Contact Agent";
@@ -63,6 +96,18 @@ const PropertyCard = ({ property }: { property: Property }) => {
               className={`${mono} absolute top-3 left-3 z-10 border border-[#14213D] bg-[#14213D] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-wider text-[#F7F5EF] shadow-md`}
             >
               {property.type}
+            </span>
+          )}
+
+          {/* علامة العين تظهر هنا تلقائياً بناءً على بيانات الـ API للمستخدم المسجل */}
+          {isViewed && (
+            <span
+              title="You viewed this property"
+              aria-label="Viewed"
+              className={`${mono} absolute top-3 right-3 z-30 flex items-center gap-1.5 border border-[#B8863B] bg-[#FFFDF9] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-wider text-[#B8863B] shadow-md`}
+            >
+              <EyeIcon className="h-4 w-4" />
+              <span>Viewed</span>
             </span>
           )}
 
@@ -140,6 +185,7 @@ const PropertyCard = ({ property }: { property: Property }) => {
 
         <Link
           to={`/properties/${property.id}`}
+          onClick={handleDetailsClick}
           className={`${mono} flex items-center gap-1 border border-[#14213D] bg-[#14213D] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[#F7F5EF] transition-all hover:border-[#B8863B] hover:bg-[#B8863B]`}
         >
           <span>Details</span>
@@ -155,12 +201,25 @@ const Properties = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
+  // 2. جلب بيانات المستخدم المسجل دخوله ديناميكياً
+  const { data: currentUser } = usegetme();
+  console.log(currentUser)
+  const currentUserId = currentUser?.data.userId;
+
   const { data, isLoading, isError } = usegetallprop({
     page: currentPage,
     limit: itemsPerPage,
     type: activeTab,
     status: "AVAILABLE",
   });
+
+  // 3. تمرير الـ userId الفعلي لجلب المشاهدات الخاصة به فقط
+  const { data: viewedPropsData } = useGetViewedPropertiesByUser(currentUserId);
+
+  // استخراج الـ IDs الخاصة بالعقارات المشاهدة
+  const viewedPropertyIds = Array.isArray(viewedPropsData)
+    ? viewedPropsData.map((item: any) => Number(item.propertyId))
+    : [];
 
   const properties: Property[] = data?.data ?? [];
 
@@ -327,9 +386,16 @@ const Properties = () => {
       ) : (
         <>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {properties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
-            ))}
+            {properties.map((property) => {
+              const isViewed = viewedPropertyIds.includes(Number(property.id));
+              return (
+                <PropertyCard
+                  key={property.id}
+                  property={property}
+                  isViewed={isViewed}
+                />
+              );
+            })}
           </div>
 
           {/* PAGINATION BAR */}

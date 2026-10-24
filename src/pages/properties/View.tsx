@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { usegetbyid } from "../../hooks/useProp";
 import { usegetimgbyid } from "../../hooks/usefiles";
+import { useLogViewedProperty } from "../../hooks/useviewProp";
 import Addtofav from "./Addtofav";
 import RequestCancle from "./Request&Cancle";
 import { usegetme } from "../../hooks/useUsers";
@@ -16,10 +17,21 @@ const View = () => {
   const [currentImagePage, setCurrentImagePage] = useState(1);
 
   const { data, isLoading, isError, error } = usegetbyid(Id);
-console.log(data)
   const { data: imagesData, isLoading: imagesLoading } = usegetimgbyid(Id);
   const { data: user } = usegetme();
 
+  // تفعيل هوك تسجيل المشاهدة تلقائياً عند فتح تفاصيل العقار
+  const { mutate: logView } = useLogViewedProperty();
+
+  useEffect(() => {
+    if (Id && !isNaN(Id)) {
+      logView(Id, {
+        onError: () => {
+          // تجاهل الخطأ في حال عدم تسجيل الدخول لكي لا يتأثر تصفح الزوار
+        },
+      });
+    }
+  }, [Id, logView]);
 
   if (isLoading || imagesLoading) {
     return (

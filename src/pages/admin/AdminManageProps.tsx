@@ -49,6 +49,7 @@ export const AdminManageProps: React.FC = () => {
     propertiesResponse?.items ||
     propertiesResponse ||
     [];
+console .log("================?>>>",propertiesResponse)
 
   // استخراج تفاصيل الباجنيشن من الـ Backend (مع قيم افتراضية safety checks)
   const totalItems =

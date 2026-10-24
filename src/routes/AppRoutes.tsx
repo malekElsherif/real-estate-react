@@ -58,6 +58,7 @@ import Chat from "../pages/chats/Chat";
 import ChatsList from "../pages/chats/ChatList";
 import AdminManageProps from "../pages/admin/AdminManageProps";
 import Settings from "../pages/admin/Settings";
+import AiRecommendations from "../pages/properties/Recomendation";
 
 const AppRoutes = () => {
   return (
@@ -86,7 +87,10 @@ const AppRoutes = () => {
       <Route element={<AuthProtectedRoute />}>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
-        {/* Profile */}
+          {/* Profile */}
+          <Route path="/AiRecommendations"
+            element={<AiRecommendations />}
+          />
 
         <Route
           path="/profile"
