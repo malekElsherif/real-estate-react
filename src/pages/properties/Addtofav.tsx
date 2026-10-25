@@ -1,124 +1,34 @@
-import { IconButton, Tooltip } from "@mui/material";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-
-import {
-  useaddtoFav,
-  usedelfav,
-  useistfav,
-} from "../../hooks/usefav";
-
 import { useQueryClient } from "@tanstack/react-query";
+import { useaddtoFav, usedelfav, useistfav } from "../../hooks/usefav";
 
-type AddtofavProps = {
-  id: number;
-};
+const Addtofav = ({ id }: { id: number }) => {
+  const qc = useQueryClient();
+  const { data, isLoading } = useistfav(id);
+  const add = useaddtoFav(id);
+  const del = usedelfav(id);
 
-const Addtofav = ({ id }: AddtofavProps) => {
-  const queryClient = useQueryClient();
+  const isFav = data?.data === true;
+  const busy = isLoading || add.isPending || del.isPending;
 
-  // Check if property is already favorite
-  const {
-    data,
-    isLoading: isCheckingFav,
-  } = useistfav(id);
-
-  // Add favorite
-  const {
-    mutate: addFavorite,
-    isPending: isAdding,
-  } = useaddtoFav(id);
-
-  // Delete favorite
-  const {
-    mutate: deleteFavorite,
-    isPending: isDeleting,
-  } = usedelfav(id);
-
-  const isFavorite = data?.data === true;
-
-  const handleFavorite = () => {
-    if (isFavorite) {
-      // Remove from favorites
-      deleteFavorite(undefined, {
-        onSuccess: () => {
-          console.log("Removed from favorites");
-
-          queryClient.invalidateQueries({
-            queryKey: ["isfav", id],
-          });
-
-          queryClient.invalidateQueries({
-            queryKey: ["getmyfav"],
-          });
-        },
-      });
-    } else {
-      // Add to favorites
-      addFavorite(id, {
-        onSuccess: () => {
-          console.log("Added to favorites");
-
-          queryClient.invalidateQueries({
-            queryKey: ["isfav", id],
-          });
-
-          queryClient.invalidateQueries({
-            queryKey: ["getmyfav"],
-          });
-        },
-      });
-    }
+  const refresh = {
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["isfav", id] });
+      qc.invalidateQueries({ queryKey: ["getmyfav"] });
+    },
   };
 
-  const isPending =
-    isAdding ||
-    isDeleting ||
-    isCheckingFav;
-
   return (
-    <Tooltip
-      title={
-        isFavorite
-          ? "Remove from favorites"
-          : "Add to favorites"
-      }
+    <button
+      type="button"
+      title={isFav ? "Remove from favorites" : "Add to favorites"}
+      disabled={busy}
+      onClick={() => (isFav ? del.mutate(undefined, refresh) : add.mutate(id, refresh))}
+      className={`grid h-10 w-10 place-items-center rounded-full bg-white text-xl shadow-md ring-1 ring-stone-100 transition hover:scale-110 disabled:opacity-60 ${
+        isFav ? "text-rose-500" : "text-stone-400"
+      }`}
     >
-      <span>
-        <IconButton
-          onClick={handleFavorite}
-          disabled={isPending}
-          sx={{
-            backgroundColor: "white",
-            boxShadow: 2,
-
-            "&:hover": {
-              backgroundColor: "#fff1f2",
-            },
-
-            "&:disabled": {
-              opacity: 0.6,
-            },
-          }}
-        >
-          {isFavorite ? (
-            <FavoriteIcon
-              sx={{
-                color: "#ef4444",
-                fontSize: 28,
-              }}
-            />
-          ) : (
-            <FavoriteBorderIcon
-              sx={{
-                color: "#ef4444",
-                fontSize: 28,
-              }}
-            />
-          )}
-        </IconButton>
-      </span>
-    </Tooltip>
+      {isFav ? "♥" : "♡"}
+    </button>
   );
 };
 

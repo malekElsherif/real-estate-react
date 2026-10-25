@@ -5,9 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { useaddprop } from "../../hooks/useProp";
 import { usegetme } from "../../hooks/useUsers";
 
-const serif = "[font-family:'Fraunces',serif]";
-const mono = "[font-family:'IBM_Plex_Mono',monospace]";
-
 type PropertyFormData = {
   title: string;
   description: string;
@@ -37,9 +34,7 @@ const AddPropertyPage = () => {
 
   const onSubmit = (data: PropertyFormData) => {
     mutate(data, {
-      onSuccess: (response) => {
-        console.log("PROPERTY CREATED:", response);
-
+      onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: ["getbyuser", id],
         });
@@ -48,8 +43,7 @@ const AddPropertyPage = () => {
         reset();
         navigate("/agent/my-properties");
       },
-      onError: (error) => {
-        console.error("ERROR:", error);
+      onError: () => {
         toast.error("Something went wrong");
       },
     });
@@ -61,19 +55,17 @@ const AddPropertyPage = () => {
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      {/* =========================
-          Header Section
-      ========================= */}
-      <div className="flex flex-col gap-2 border-b border-[#14213D] pb-5 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mx-auto max-w-4xl space-y-6 text-stone-900">
+      {/* Header Section */}
+      <div className="flex flex-col gap-2 border-b border-stone-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <span className={`${mono} text-[10px] uppercase tracking-[0.2em] text-[#B8863B]`}>
+          <span className="text-xs font-semibold uppercase tracking-wider text-amber-800">
             New Listing Dossier
           </span>
-          <h1 className={`${serif} text-2xl font-semibold text-[#14213D] md:text-3xl`}>
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
             Add New Property
           </h1>
-          <p className={`${mono} mt-1 text-xs text-[#4A5568]`}>
+          <p className="mt-1 text-xs text-stone-500">
             Fill in the parameters below to publish a new estate listing.
           </p>
         </div>
@@ -81,35 +73,33 @@ const AddPropertyPage = () => {
         <button
           type="button"
           onClick={handleCancel}
-          className={`${mono} text-xs font-semibold uppercase tracking-wider text-[#4A5568] hover:text-[#14213D]`}
+          className="text-xs font-semibold uppercase tracking-wider text-stone-500 hover:text-amber-800 cursor-pointer"
         >
           ← Cancel & Return
         </button>
       </div>
 
-      {/* =========================
-          Form Card
-      ========================= */}
+      {/* Form Card */}
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="border border-[#14213D] bg-[#FFFDF9] p-6 sm:p-8 space-y-6"
+        className="rounded-2xl border border-stone-100 bg-white p-6 shadow-sm sm:p-8 space-y-6"
       >
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {/* Title */}
           <div className="sm:col-span-2 space-y-1">
-            <label className={`${mono} text-[10px] uppercase tracking-wider text-[#4A5568]`}>
+            <label className="text-xs font-semibold uppercase tracking-wider text-stone-700">
               Property Title *
             </label>
             <input
               type="text"
               placeholder="e.g. Modern Minimalist Villa"
               {...register("title", { required: "Title is required" })}
-              className={`w-full border bg-[#F7F5EF] p-3 text-sm text-[#14213D] outline-none transition focus:border-[#14213D] ${
-                errors.title ? "border-[#B8452E]" : "border-[#E4DFD3]"
+              className={`w-full rounded-xl border bg-stone-50 p-3 text-sm outline-none transition focus:border-amber-800 focus:bg-white focus:ring-1 focus:ring-amber-800 ${
+                errors.title ? "border-rose-500" : "border-stone-200"
               }`}
             />
             {errors.title && (
-              <p className={`${mono} text-[10px] text-[#B8452E]`}>
+              <p className="text-xs font-medium text-rose-600">
                 {errors.title.message}
               </p>
             )}
@@ -117,14 +107,14 @@ const AddPropertyPage = () => {
 
           {/* Type */}
           <div className="space-y-1">
-            <label className={`${mono} text-[10px] uppercase tracking-wider text-[#4A5568]`}>
+            <label className="text-xs font-semibold uppercase tracking-wider text-stone-700">
               Listing Type *
             </label>
             <select
               defaultValue=""
               {...register("type", { required: "Listing type is required" })}
-              className={`w-full border bg-[#F7F5EF] p-3 text-sm text-[#14213D] outline-none transition focus:border-[#14213D] ${
-                errors.type ? "border-[#B8452E]" : "border-[#E4DFD3]"
+              className={`w-full rounded-xl border bg-stone-50 p-3 text-sm outline-none transition focus:border-amber-800 focus:bg-white focus:ring-1 focus:ring-amber-800 ${
+                errors.type ? "border-rose-500" : "border-stone-200"
               }`}
             >
               <option value="" disabled>
@@ -134,7 +124,7 @@ const AddPropertyPage = () => {
               <option value="RENT">For Rent</option>
             </select>
             {errors.type && (
-              <p className={`${mono} text-[10px] text-[#B8452E]`}>
+              <p className="text-xs font-medium text-rose-600">
                 {errors.type.message}
               </p>
             )}
@@ -142,7 +132,7 @@ const AddPropertyPage = () => {
 
           {/* Price */}
           <div className="space-y-1">
-            <label className={`${mono} text-[10px] uppercase tracking-wider text-[#4A5568]`}>
+            <label className="text-xs font-semibold uppercase tracking-wider text-stone-700">
               Price ($) *
             </label>
             <input
@@ -152,12 +142,12 @@ const AddPropertyPage = () => {
                 required: "Price is required",
                 valueAsNumber: true,
               })}
-              className={`w-full border bg-[#F7F5EF] p-3 text-sm text-[#14213D] outline-none transition focus:border-[#14213D] ${
-                errors.price ? "border-[#B8452E]" : "border-[#E4DFD3]"
+              className={`w-full rounded-xl border bg-stone-50 p-3 text-sm outline-none transition focus:border-amber-800 focus:bg-white focus:ring-1 focus:ring-amber-800 ${
+                errors.price ? "border-rose-500" : "border-stone-200"
               }`}
             />
             {errors.price && (
-              <p className={`${mono} text-[10px] text-[#B8452E]`}>
+              <p className="text-xs font-medium text-rose-600">
                 {errors.price.message}
               </p>
             )}
@@ -165,7 +155,7 @@ const AddPropertyPage = () => {
 
           {/* Area */}
           <div className="space-y-1">
-            <label className={`${mono} text-[10px] uppercase tracking-wider text-[#4A5568]`}>
+            <label className="text-xs font-semibold uppercase tracking-wider text-stone-700">
               Area (m²) *
             </label>
             <input
@@ -175,12 +165,12 @@ const AddPropertyPage = () => {
                 required: "Area is required",
                 valueAsNumber: true,
               })}
-              className={`w-full border bg-[#F7F5EF] p-3 text-sm text-[#14213D] outline-none transition focus:border-[#14213D] ${
-                errors.area ? "border-[#B8452E]" : "border-[#E4DFD3]"
+              className={`w-full rounded-xl border bg-stone-50 p-3 text-sm outline-none transition focus:border-amber-800 focus:bg-white focus:ring-1 focus:ring-amber-800 ${
+                errors.area ? "border-rose-500" : "border-stone-200"
               }`}
             />
             {errors.area && (
-              <p className={`${mono} text-[10px] text-[#B8452E]`}>
+              <p className="text-xs font-medium text-rose-600">
                 {errors.area.message}
               </p>
             )}
@@ -188,7 +178,7 @@ const AddPropertyPage = () => {
 
           {/* Bedrooms */}
           <div className="space-y-1">
-            <label className={`${mono} text-[10px] uppercase tracking-wider text-[#4A5568]`}>
+            <label className="text-xs font-semibold uppercase tracking-wider text-stone-700">
               Bedrooms *
             </label>
             <input
@@ -198,12 +188,12 @@ const AddPropertyPage = () => {
                 required: "Bedrooms is required",
                 valueAsNumber: true,
               })}
-              className={`w-full border bg-[#F7F5EF] p-3 text-sm text-[#14213D] outline-none transition focus:border-[#14213D] ${
-                errors.bedrooms ? "border-[#B8452E]" : "border-[#E4DFD3]"
+              className={`w-full rounded-xl border bg-stone-50 p-3 text-sm outline-none transition focus:border-amber-800 focus:bg-white focus:ring-1 focus:ring-amber-800 ${
+                errors.bedrooms ? "border-rose-500" : "border-stone-200"
               }`}
             />
             {errors.bedrooms && (
-              <p className={`${mono} text-[10px] text-[#B8452E]`}>
+              <p className="text-xs font-medium text-rose-600">
                 {errors.bedrooms.message}
               </p>
             )}
@@ -211,7 +201,7 @@ const AddPropertyPage = () => {
 
           {/* Bathrooms */}
           <div className="space-y-1">
-            <label className={`${mono} text-[10px] uppercase tracking-wider text-[#4A5568]`}>
+            <label className="text-xs font-semibold uppercase tracking-wider text-stone-700">
               Bathrooms *
             </label>
             <input
@@ -221,12 +211,12 @@ const AddPropertyPage = () => {
                 required: "Bathrooms is required",
                 valueAsNumber: true,
               })}
-              className={`w-full border bg-[#F7F5EF] p-3 text-sm text-[#14213D] outline-none transition focus:border-[#14213D] ${
-                errors.bathrooms ? "border-[#B8452E]" : "border-[#E4DFD3]"
+              className={`w-full rounded-xl border bg-stone-50 p-3 text-sm outline-none transition focus:border-amber-800 focus:bg-white focus:ring-1 focus:ring-amber-800 ${
+                errors.bathrooms ? "border-rose-500" : "border-stone-200"
               }`}
             />
             {errors.bathrooms && (
-              <p className={`${mono} text-[10px] text-[#B8452E]`}>
+              <p className="text-xs font-medium text-rose-600">
                 {errors.bathrooms.message}
               </p>
             )}
@@ -234,19 +224,19 @@ const AddPropertyPage = () => {
 
           {/* City */}
           <div className="space-y-1">
-            <label className={`${mono} text-[10px] uppercase tracking-wider text-[#4A5568]`}>
+            <label className="text-xs font-semibold uppercase tracking-wider text-stone-700">
               City *
             </label>
             <input
               type="text"
               placeholder="Tanta"
               {...register("city", { required: "City is required" })}
-              className={`w-full border bg-[#F7F5EF] p-3 text-sm text-[#14213D] outline-none transition focus:border-[#14213D] ${
-                errors.city ? "border-[#B8452E]" : "border-[#E4DFD3]"
+              className={`w-full rounded-xl border bg-stone-50 p-3 text-sm outline-none transition focus:border-amber-800 focus:bg-white focus:ring-1 focus:ring-amber-800 ${
+                errors.city ? "border-rose-500" : "border-stone-200"
               }`}
             />
             {errors.city && (
-              <p className={`${mono} text-[10px] text-[#B8452E]`}>
+              <p className="text-xs font-medium text-rose-600">
                 {errors.city.message}
               </p>
             )}
@@ -254,19 +244,19 @@ const AddPropertyPage = () => {
 
           {/* Address */}
           <div className="sm:col-span-2 space-y-1">
-            <label className={`${mono} text-[10px] uppercase tracking-wider text-[#4A5568]`}>
+            <label className="text-xs font-semibold uppercase tracking-wider text-stone-700">
               Street Address *
             </label>
             <input
               type="text"
               placeholder="El Bahr Street"
               {...register("address", { required: "Address is required" })}
-              className={`w-full border bg-[#F7F5EF] p-3 text-sm text-[#14213D] outline-none transition focus:border-[#14213D] ${
-                errors.address ? "border-[#B8452E]" : "border-[#E4DFD3]"
+              className={`w-full rounded-xl border bg-stone-50 p-3 text-sm outline-none transition focus:border-amber-800 focus:bg-white focus:ring-1 focus:ring-amber-800 ${
+                errors.address ? "border-rose-500" : "border-stone-200"
               }`}
             />
             {errors.address && (
-              <p className={`${mono} text-[10px] text-[#B8452E]`}>
+              <p className="text-xs font-medium text-rose-600">
                 {errors.address.message}
               </p>
             )}
@@ -274,19 +264,19 @@ const AddPropertyPage = () => {
 
           {/* Description */}
           <div className="sm:col-span-2 space-y-1">
-            <label className={`${mono} text-[10px] uppercase tracking-wider text-[#4A5568]`}>
+            <label className="text-xs font-semibold uppercase tracking-wider text-stone-700">
               Full Description *
             </label>
             <textarea
               rows={4}
               placeholder="Detailed description of the estate..."
               {...register("description", { required: "Description is required" })}
-              className={`w-full border bg-[#F7F5EF] p-3 text-sm text-[#14213D] outline-none transition focus:border-[#14213D] ${
-                errors.description ? "border-[#B8452E]" : "border-[#E4DFD3]"
+              className={`w-full rounded-xl border bg-stone-50 p-3 text-sm outline-none transition focus:border-amber-800 focus:bg-white focus:ring-1 focus:ring-amber-800 ${
+                errors.description ? "border-rose-500" : "border-stone-200"
               }`}
             />
             {errors.description && (
-              <p className={`${mono} text-[10px] text-[#B8452E]`}>
+              <p className="text-xs font-medium text-rose-600">
                 {errors.description.message}
               </p>
             )}
@@ -294,11 +284,11 @@ const AddPropertyPage = () => {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-3 border-t border-[#14213D] pt-5">
+        <div className="flex items-center justify-end gap-3 border-t border-stone-200 pt-5">
           <button
             type="button"
             onClick={handleCancel}
-            className={`${mono} border border-[#14213D] bg-transparent px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#14213D] transition hover:bg-[#F7F5EF]`}
+            className="rounded-xl border border-stone-200 bg-white px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-stone-700 transition hover:bg-stone-50 cursor-pointer"
           >
             Cancel
           </button>
@@ -306,7 +296,7 @@ const AddPropertyPage = () => {
           <button
             type="submit"
             disabled={isPending}
-            className={`${mono} border border-[#14213D] bg-[#14213D] px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#F7F5EF] transition hover:border-[#B8863B] hover:bg-[#B8863B] disabled:opacity-50`}
+            className="rounded-xl bg-amber-800 px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-amber-900 disabled:opacity-50 cursor-pointer"
           >
             {isPending ? "Creating Listing..." : "Save Property"}
           </button>

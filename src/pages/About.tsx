@@ -1,195 +1,126 @@
 import { Link } from "react-router-dom";
 
-const FontImports = () => (
-  <style>{`@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');`}</style>
-);
+const btnLight = "no-underline rounded-xl border border-white/30 px-7 py-3 text-sm font-medium text-white transition hover:bg-white/10";
 
-const serif = "[font-family:'Fraunces',serif]";
-const mono = "[font-family:'IBM_Plex_Mono',monospace]";
+export const About = () => {
+  const stats = [
+    ["100+", "Curated Properties"],
+    ["50+", "Verified Agents"],
+    ["500+", "Satisfied Clients"],
+    ["24/7", "Dedicated Support"],
+  ];
 
-const About = () => {
+  const features = [
+    {
+      step: "01",
+      title: "Intuitive Filtering",
+      description: "Search listings by status, type, location, and parameters to quickly locate properties matching your specs.",
+    },
+    {
+      step: "02",
+      title: "Verified Property Portfolio",
+      description: "Explore residential and commercial spaces backdropped by verified ownership records and precise imagery.",
+    },
+    {
+      step: "03",
+      title: "Direct Agent Management",
+      description: "Submit inquiries directly, coordinate viewings, and manage rental/purchase offers without intermediate friction.",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#FFFDF9] text-[#14213D] antialiased">
-      <FontImports />
-
+    <div className="min-h-screen bg-stone-50 text-stone-900 antialiased">
       {/* Hero Section */}
-      <section className="relative border-b border-[#14213D] bg-[#14213D] px-6 py-20 text-[#F7F5EF] lg:py-28">
-        <div className="mx-auto max-w-6xl text-center">
-          <span
-            className={`${mono} inline-flex items-center gap-2 border border-[#B8863B]/40 bg-[#14213D] px-4 py-1.5 text-xs font-medium uppercase tracking-[0.2em] text-[#B8863B]`}
-          >
-            <span className="h-1.5 w-1.5 bg-[#B8863B]" />
+      <section className="relative overflow-hidden bg-stone-900">
+        <img
+          src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-40"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/50 to-transparent" />
+
+        <div className="relative mx-auto max-w-4xl px-4 py-24 text-center sm:py-32">
+          <span className="inline-block rounded-full bg-amber-800/80 px-4 py-1 text-xs font-medium uppercase tracking-wider text-amber-100 backdrop-blur">
             About Estate
           </span>
-
-          <h1
-            className={`${serif} mt-6 text-4xl font-semibold leading-tight text-[#F7F5EF] sm:text-6xl`}
-          >
+          <h1 className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-6xl">
             Find a place you'll <br />
-            <span className="italic text-[#B8863B]">love to call home.</span>
+            <span className="text-amber-300">love to call home.</span>
           </h1>
-
-          <p className="mx-auto mt-6 max-w-2xl text-sm leading-relaxed text-[#EFEAE0] sm:text-base">
-            We simplify finding, buying, and renting premium properties by
-            connecting discerning clients with curated listings and trusted management.
+          <p className="mx-auto mt-5 max-w-xl text-stone-300">
+            We simplify finding, buying, and renting premium properties by connecting discerning clients with curated listings and trusted management.
           </p>
         </div>
       </section>
 
       {/* Who We Are & Stats Section */}
-      <section className="mx-auto max-w-7xl px-6 py-20">
+      <section className="mx-auto max-w-7xl px-4 py-16">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <div>
-            <span className={`${mono} text-xs font-medium uppercase tracking-[0.25em] text-[#B8863B]`}>
+            <span className="text-xs font-medium uppercase tracking-wider text-amber-800">
               Who We Are
             </span>
-
-            <h2 className={`${serif} mt-2 text-3xl font-semibold text-[#14213D] sm:text-4xl`}>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
               Architectural Clarity & Modern Living
             </h2>
-
-            <p className="mt-6 text-sm leading-relaxed text-[#4A5568] sm:text-base">
-              Our platform provides an intentional, refined way to discover
-              properties that match your lifestyle. Whether you're purchasing a permanent residence,
-              securing a luxury rental, or managing high-end assets, we unify every step of the workflow.
+            <p className="mt-4 text-sm leading-relaxed text-stone-500 sm:text-base">
+              Our platform provides an intentional, refined way to discover properties that match your lifestyle. Whether you're purchasing a permanent residence, securing a luxury rental, or managing high-end assets, we unify every step of the workflow.
             </p>
-
-            <p className="mt-4 text-sm leading-relaxed text-[#4A5568] sm:text-base">
+            <p className="mt-3 text-sm leading-relaxed text-stone-500 sm:text-base">
               From detailed spec sheets and verified imagery to direct agent communication and streamlined request tracking, we prioritize transparency and elegance.
             </p>
           </div>
 
           {/* Stats Grid */}
-          <div className="border border-[#14213D] bg-[#FFFDF9] p-8">
-            <div className="grid grid-cols-2 gap-6 divide-y-0">
-              <div className="border border-[#E4DFD3] p-6 text-center">
-                <h3 className={`${serif} text-3xl font-semibold text-[#14213D] sm:text-4xl`}>
-                  100+
-                </h3>
-                <p className={`${mono} mt-2 text-[11px] uppercase tracking-widest text-[#4A5568]`}>
-                  Curated Properties
-                </p>
+          <div className="grid grid-cols-2 gap-4 rounded-3xl border border-stone-100 bg-white p-6 shadow-sm">
+            {stats.map(([value, label], index) => (
+              <div key={index} className="rounded-2xl bg-stone-50 p-6 text-center">
+                <p className="text-3xl font-bold text-stone-900 sm:text-4xl">{value}</p>
+                <p className="mt-2 text-xs font-medium uppercase tracking-wider text-stone-500">{label}</p>
               </div>
-
-              <div className="border border-[#E4DFD3] p-6 text-center">
-                <h3 className={`${serif} text-3xl font-semibold text-[#14213D] sm:text-4xl`}>
-                  50+
-                </h3>
-                <p className={`${mono} mt-2 text-[11px] uppercase tracking-widest text-[#4A5568]`}>
-                  Verified Agents
-                </p>
-              </div>
-
-              <div className="border border-[#E4DFD3] p-6 text-center">
-                <h3 className={`${serif} text-3xl font-semibold text-[#14213D] sm:text-4xl`}>
-                  500+
-                </h3>
-                <p className={`${mono} mt-2 text-[11px] uppercase tracking-widest text-[#4A5568]`}>
-                  Satisfied Clients
-                </p>
-              </div>
-
-              <div className="border border-[#E4DFD3] p-6 text-center">
-                <h3 className={`${serif} text-3xl font-semibold text-[#14213D] sm:text-4xl`}>
-                  24/7
-                </h3>
-                <p className={`${mono} mt-2 text-[11px] uppercase tracking-widest text-[#4A5568]`}>
-                  Dedicated Support
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="border-t border-[#14213D] bg-[#FFFDF9] px-6 py-20">
+      <section className="bg-white px-4 py-16">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 text-center">
-            <span className={`${mono} text-xs font-medium uppercase tracking-[0.25em] text-[#B8863B]`}>
+            <span className="text-xs font-medium uppercase tracking-wider text-amber-800">
               Why Choose Us
             </span>
-
-            <h2 className={`${serif} mt-2 text-3xl font-semibold text-[#14213D] sm:text-4xl`}>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
               Designed for Seamless Property Discovery
             </h2>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-3">
-            {/* Feature 1 */}
-            <div className="relative flex flex-col border border-[#14213D] bg-[#FFFDF9] p-8">
-              <span className="pointer-events-none absolute -left-px -top-px h-2.5 w-2.5 border-l-[1.5px] border-t-[1.5px] border-[#14213D]" />
-              <span className="pointer-events-none absolute -right-px -top-px h-2.5 w-2.5 border-r-[1.5px] border-t-[1.5px] border-[#14213D]" />
-
-              <div className={`${mono} mb-6 flex h-10 w-10 items-center justify-center border border-[#14213D] bg-[#EFEAE0] text-sm font-semibold text-[#14213D]`}>
-                01
+          <div className="grid gap-6 md:grid-cols-3">
+            {features.map((feature, index) => (
+              <div key={index} className="flex flex-col rounded-2xl border border-stone-100 bg-stone-50 p-8 shadow-sm">
+                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-sm font-semibold text-amber-800">
+                  {feature.step}
+                </div>
+                <h3 className="text-xl font-semibold text-stone-900">{feature.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-stone-500">{feature.description}</p>
               </div>
-
-              <h3 className={`${serif} text-xl font-semibold text-[#14213D]`}>
-                Intuitive Filtering
-              </h3>
-
-              <p className="mt-3 text-sm leading-relaxed text-[#4A5568]">
-                Search listings by status, type, location, and parameters to quickly locate properties matching your specs.
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="relative flex flex-col border border-[#14213D] bg-[#FFFDF9] p-8">
-              <span className="pointer-events-none absolute -left-px -top-px h-2.5 w-2.5 border-l-[1.5px] border-t-[1.5px] border-[#14213D]" />
-              <span className="pointer-events-none absolute -right-px -top-px h-2.5 w-2.5 border-r-[1.5px] border-t-[1.5px] border-[#14213D]" />
-
-              <div className={`${mono} mb-6 flex h-10 w-10 items-center justify-center border border-[#14213D] bg-[#EFEAE0] text-sm font-semibold text-[#14213D]`}>
-                02
-              </div>
-
-              <h3 className={`${serif} text-xl font-semibold text-[#14213D]`}>
-                Verified Property Portfolio
-              </h3>
-
-              <p className="mt-3 text-sm leading-relaxed text-[#4A5568]">
-                Explore residential and commercial spaces backdropped by verified ownership records and precise imagery.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="relative flex flex-col border border-[#14213D] bg-[#FFFDF9] p-8">
-              <span className="pointer-events-none absolute -left-px -top-px h-2.5 w-2.5 border-l-[1.5px] border-t-[1.5px] border-[#14213D]" />
-              <span className="pointer-events-none absolute -right-px -top-px h-2.5 w-2.5 border-r-[1.5px] border-t-[1.5px] border-[#14213D]" />
-
-              <div className={`${mono} mb-6 flex h-10 w-10 items-center justify-center border border-[#14213D] bg-[#EFEAE0] text-sm font-semibold text-[#14213D]`}>
-                03
-              </div>
-
-              <h3 className={`${serif} text-xl font-semibold text-[#14213D]`}>
-                Direct Agent Management
-              </h3>
-
-              <p className="mt-3 text-sm leading-relaxed text-[#4A5568]">
-                Submit inquiries directly, coordinate viewings, and manage rental/purchase offers without intermediate friction.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-5xl border border-[#14213D] bg-[#14213D] px-8 py-16 text-center text-[#F7F5EF]">
-          <h2 className={`${serif} text-3xl font-semibold sm:text-4xl`}>
-            Ready to find your next property?
-          </h2>
-
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-[#EFEAE0]">
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-5xl rounded-3xl bg-gradient-to-br from-amber-800 to-stone-900 px-6 py-14 text-center text-white">
+          <h2 className="text-3xl font-bold sm:text-4xl">Ready to find your next property?</h2>
+          <p className="mx-auto mt-3 max-w-xl text-amber-100">
             Browse our complete catalog of houses, villas, and apartments available across Egypt.
           </p>
-
-          <Link
-            to="/properties"
-            className={`${mono} mt-8 inline-block border border-[#F7F5EF] bg-[#FFFDF9] px-8 py-3 text-xs font-semibold uppercase tracking-wider text-[#14213D] transition hover:bg-[#B8863B] hover:border-[#B8863B] hover:text-[#FFFDF9]`}
-          >
-            Explore Properties
-          </Link>
+          <div className="mt-8 flex justify-center">
+            <Link to="/properties" className={btnLight}>
+              Explore Properties
+            </Link>
+          </div>
         </div>
       </section>
     </div>

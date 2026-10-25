@@ -5,9 +5,6 @@ import { usegetme } from "../../hooks/useUsers";
 import { usegetpropbyuser } from "../../hooks/useProp";
 import Imgcard from "../properties/Imgcard";
 
-const serif = "[font-family:'Fraunces',serif]";
-const mono = "[font-family:'IBM_Plex_Mono',monospace]";
-
 const AgentRecentProperties = () => {
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
@@ -28,10 +25,10 @@ const AgentRecentProperties = () => {
 
   if (meLoading || propertiesLoading) {
     return (
-      <div className="flex min-h-[300px] items-center justify-center border border-[#14213D] bg-[#FFFDF9]">
+      <div className="flex min-h-[300px] items-center justify-center rounded-2xl border border-stone-100 bg-white shadow-sm">
         <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[#E4DFD3] border-t-[#14213D]" />
-          <p className={`${mono} mt-3 text-xs uppercase tracking-widest text-[#4A5568]`}>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-stone-200 border-t-amber-800" />
+          <p className="mt-3 text-xs uppercase tracking-wider text-stone-500">
             Loading properties...
           </p>
         </div>
@@ -40,38 +37,34 @@ const AgentRecentProperties = () => {
   }
 
   return (
-    <section className="relative border border-[#14213D] bg-[#FFFDF9]">
-      {/* Corner registration marks */}
-      <span className="pointer-events-none absolute -left-px -top-px h-2.5 w-2.5 border-l-[1.5px] border-t-[1.5px] border-[#14213D]" />
-      <span className="pointer-events-none absolute -right-px -top-px h-2.5 w-2.5 border-r-[1.5px] border-t-[1.5px] border-[#14213D]" />
-
+    <section className="rounded-2xl border border-stone-100 bg-white shadow-sm overflow-hidden text-stone-900">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#14213D] p-5">
+      <div className="flex items-center justify-between border-b border-stone-100 p-5 bg-stone-50/50">
         <div>
-          <span className={`${mono} text-[10px] uppercase tracking-[0.2em] text-[#B8863B]`}>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-800">
             Inventory
           </span>
-          <h2 className={`${serif} text-xl font-semibold text-[#14213D]`}>
+          <h2 className="text-xl font-bold tracking-tight text-stone-900">
             My Properties
           </h2>
         </div>
 
         <Link
           to="/agent/my-properties"
-          className={`${mono} text-xs font-semibold uppercase tracking-wider text-[#14213D] transition hover:text-[#B8863B]`}
+          className="text-xs font-semibold uppercase tracking-wider text-stone-700 no-underline transition hover:text-amber-800"
         >
           View All →
         </Link>
       </div>
 
       {/* Properties List */}
-      <div className="divide-y divide-[#E4DFD3]">
+      <div className="divide-y divide-stone-100">
         {recentProperties.length === 0 ? (
           <div className="p-10 text-center">
-            <h3 className={`${serif} text-lg font-medium text-[#14213D]`}>
+            <h3 className="text-lg font-semibold text-stone-900">
               No Properties Listed
             </h3>
-            <p className="mt-1 text-xs text-[#4A5568]">
+            <p className="mt-1 text-xs text-stone-500">
               You haven't added any properties to your portfolio yet.
             </p>
           </div>
@@ -83,23 +76,23 @@ const AgentRecentProperties = () => {
               property.status?.toUpperCase() === "ACTIVE";
 
             return (
-              <div key={property.id} className="group transition hover:bg-[#F7F5EF]">
+              <div key={property.id} className="group transition hover:bg-stone-50">
                 {/* Compact Row */}
                 <button
                   type="button"
                   onClick={() => toggleProperty(property.id)}
-                  className="flex w-full items-center gap-4 p-4 text-left"
+                  className="flex w-full items-center gap-4 p-4 text-left cursor-pointer"
                 >
                   {/* Image Container */}
-                  <div className="group/img relative flex h-20 w-24 shrink-0 items-center justify-center overflow-hidden border border-[#14213D] bg-[#EFEAE0]">
+                  <div className="group/img relative flex h-20 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-stone-200 bg-stone-100">
                     {/* Zoomable Image */}
                     <div className="flex h-full w-full items-center justify-center transition-transform duration-300 group-hover/img:scale-110 [&_img]:h-full [&_img]:w-full [&_img]:object-contain">
                       <Imgcard propertyId={property.id} />
                     </div>
 
-                    {/* Location Badge (Small Pin 📍 + City Name) - Hover Only */}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-full bg-[#14213D]/90 p-0.5 backdrop-blur-xs transition-all duration-300 group-hover/img:translate-y-0 group-hover/img:opacity-100">
-                      <p className={`${mono} truncate text-center text-[8.5px] uppercase tracking-wider text-[#F7F5EF]`}>
+                    {/* Location Badge */}
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-full bg-stone-900/90 p-1 backdrop-blur-xs transition-all duration-300 group-hover/img:translate-y-0 group-hover/img:opacity-100">
+                      <p className="truncate text-center text-[8.5px] uppercase tracking-wider text-white">
                         <span className="text-[7.5px]">📍</span> {property.city || property.location || "Egypt"}
                       </p>
                     </div>
@@ -108,34 +101,34 @@ const AgentRecentProperties = () => {
                   {/* Basic Info */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className={`${serif} truncate text-base font-semibold text-[#14213D]`}>
+                      <h3 className="truncate text-base font-bold text-stone-900 group-hover:text-amber-800 transition">
                         {property.title || "Untitled Property"}
                       </h3>
 
                       <span
-                        className={`${mono} hidden shrink-0 border border-dashed px-2 py-0.5 text-[9px] font-medium uppercase tracking-widest sm:inline-block ${
+                        className={`hidden shrink-0 rounded-full px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider sm:inline-block ${
                           isAvailable
-                            ? "border-[#5B7B65] text-[#5B7B65]"
-                            : "border-[#B8452E] text-[#B8452E]"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-rose-50 text-rose-600 border border-rose-200"
                         }`}
                       >
                         {property.status || "Unknown"}
                       </span>
                     </div>
 
-                    <p className={`${mono} mt-1 truncate text-xs text-[#4A5568]`}>
-                      {property.city || property.location || "Egypt"}
+                    <p className="mt-1 truncate text-xs text-stone-500">
+                      📍 {property.city || property.location || "Egypt"}
                     </p>
 
-                    <p className={`${mono} mt-1 text-sm font-medium text-[#B8863B]`}>
+                    <p className="mt-1 text-sm font-bold text-amber-800">
                       {property.price?.toLocaleString() ?? 0} EGP
                     </p>
                   </div>
 
                   {/* Arrow Icon */}
                   <div
-                    className={`${mono} flex h-7 w-7 shrink-0 items-center justify-center border border-[#14213D] text-xs text-[#14213D] transition-transform duration-200 ${
-                      isExpanded ? "rotate-180 bg-[#14213D] text-[#F7F5EF]" : ""
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stone-200 text-xs text-stone-700 transition-transform duration-200 ${
+                      isExpanded ? "rotate-180 bg-stone-900 text-white border-stone-900" : ""
                     }`}
                   >
                     ↓
@@ -151,15 +144,15 @@ const AgentRecentProperties = () => {
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <div className="border-t border-dotted border-[#E4DFD3] px-4 pb-4 pt-3">
+                    <div className="border-t border-dotted border-stone-200 px-4 pb-4 pt-3 bg-stone-50/50">
                       {/* Status on Mobile */}
                       <div className="mb-3 flex items-center justify-between sm:hidden">
-                        <span className={`${mono} text-xs text-[#4A5568]`}>Status</span>
+                        <span className="text-xs text-stone-500">Status</span>
                         <span
-                          className={`${mono} border border-dashed px-2 py-0.5 text-[9px] font-medium uppercase tracking-widest ${
+                          className={`rounded-full px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${
                             isAvailable
-                              ? "border-[#5B7B65] text-[#5B7B65]"
-                              : "border-[#B8452E] text-[#B8452E]"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                              : "bg-rose-50 text-rose-600 border border-rose-200"
                           }`}
                         >
                           {property.status || "Unknown"}
@@ -167,24 +160,24 @@ const AgentRecentProperties = () => {
                       </div>
 
                       {/* Specs */}
-                      <div className={`${mono} grid grid-cols-3 gap-2 border border-[#E4DFD3] bg-[#FFFDF9] p-3 text-xs`}>
+                      <div className="grid grid-cols-3 gap-2 rounded-xl border border-stone-200 bg-white p-3 text-xs shadow-xs">
                         <div className="text-center">
-                          <p className="text-[10px] uppercase text-[#4A5568]">Beds</p>
-                          <p className="mt-1 font-semibold text-[#14213D]">
+                          <p className="text-[10px] uppercase text-stone-400 font-semibold">Beds</p>
+                          <p className="mt-1 font-bold text-stone-900">
                             {property.bedrooms ?? 0}
                           </p>
                         </div>
 
-                        <div className="border-x border-[#E4DFD3] text-center">
-                          <p className="text-[10px] uppercase text-[#4A5568]">Baths</p>
-                          <p className="mt-1 font-semibold text-[#14213D]">
+                        <div className="border-x border-stone-200 text-center">
+                          <p className="text-[10px] uppercase text-stone-400 font-semibold">Baths</p>
+                          <p className="mt-1 font-bold text-stone-900">
                             {property.bathrooms ?? 0}
                           </p>
                         </div>
 
                         <div className="text-center">
-                          <p className="text-[10px] uppercase text-[#4A5568]">Area</p>
-                          <p className="mt-1 font-semibold text-[#14213D]">
+                          <p className="text-[10px] uppercase text-stone-400 font-semibold">Area</p>
+                          <p className="mt-1 font-bold text-stone-900">
                             {property.area ?? 0} m²
                           </p>
                         </div>
@@ -192,14 +185,14 @@ const AgentRecentProperties = () => {
 
                       {/* Footer Actions */}
                       <div className="mt-3 flex items-center justify-between">
-                        <span className={`${mono} text-xs text-[#4A5568]`}>
+                        <span className="text-xs text-stone-500">
                           REF #{property.id}
                         </span>
 
                         <Link
                           to={`/properties/${property.id}`}
                           onClick={(e) => e.stopPropagation()}
-                          className={`${mono} border border-[#14213D] px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#14213D] transition hover:bg-[#14213D] hover:text-[#F7F5EF]`}
+                          className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-stone-700 no-underline transition hover:bg-stone-900 hover:text-white"
                         >
                           View Details →
                         </Link>

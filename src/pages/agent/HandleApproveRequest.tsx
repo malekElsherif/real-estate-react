@@ -1,4 +1,3 @@
-
 import {
   useapprovePurchaseRequestformyProperties,
   useRejectpurchaseRequestsformyProperties,
@@ -8,8 +7,6 @@ import {
   userejectrequestformyproperty,
 } from "../../hooks/userental-requests";
 import { useQueryClient } from "@tanstack/react-query";
-
-const mono = "[font-family:'IBM_Plex_Mono',monospace]";
 
 interface HandleRequestProps {
   id: number;
@@ -74,11 +71,11 @@ const HandleApproveRequest: React.FC<HandleRequestProps> = ({ id, type }) => {
         type="button"
         disabled={isApproving || isRejecting}
         onClick={handleApprove}
-        className={`${mono} flex items-center justify-center gap-1.5 border border-[#14213D] bg-[#14213D] px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#F7F5EF] transition hover:bg-[#B8863B] hover:border-[#B8863B] disabled:opacity-50`}
+        className="flex items-center justify-center gap-1.5 rounded-xl bg-stone-900 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-amber-800 disabled:opacity-50 cursor-pointer"
       >
         {isApproving ? (
           <>
-            <div className="h-3 w-3 animate-spin rounded-full border border-[#F7F5EF] border-t-transparent" />
+            <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
             <span>Approving...</span>
           </>
         ) : (
@@ -94,11 +91,11 @@ const HandleApproveRequest: React.FC<HandleRequestProps> = ({ id, type }) => {
         type="button"
         disabled={isApproving || isRejecting}
         onClick={handleReject}
-        className={`${mono} flex items-center justify-center gap-1.5 border border-[#B8452E] bg-transparent px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#B8452E] transition hover:bg-[#B8452E] hover:text-[#F7F5EF] disabled:opacity-50`}
+        className="flex items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-rose-600 transition hover:bg-rose-100 disabled:opacity-50 cursor-pointer"
       >
         {isRejecting ? (
           <>
-            <div className="h-3 w-3 animate-spin rounded-full border border-[#B8452E] border-t-transparent" />
+            <div className="h-3 w-3 animate-spin rounded-full border-2 border-rose-600 border-t-transparent" />
             <span>Rejecting...</span>
           </>
         ) : (

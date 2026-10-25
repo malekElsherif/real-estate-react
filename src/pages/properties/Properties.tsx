@@ -1,492 +1,276 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { usegetallprop } from "../../hooks/useProp";
-import { useLogViewedProperty, useGetViewedPropertiesByUser } from "../../hooks/useviewProp";
-import { usegetme } from "../../hooks/useUsers"; // 1. استيراد هوك المستخدم الحالي
+import { usegetme } from "../../hooks/useUsers";
 import Imgcard from "./Imgcard";
 
-export interface Property {
-  id: string | number;
-  title: string;
-  description: string;
-  status: "AVAILABLE" | "PENDING" | "SOLD" | "RENTED" | string;
-  type?: string;
-  price?: number | string;
-  city?: string;
-  location?: string;
-  bedrooms?: number;
-  bathrooms?: number;
-  area?: number;
-}
+export const Properties = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("AVAILABLE");
+  const [selectedCity, setSelectedCity] = useState("");
+  const [page, setPage] = useState(1);
+  const limit = 9;
 
-const serif = "[font-family:'Fraunces',serif]";
-const mono = "[font-family:'IBM_Plex_Mono',monospace]";
+  const { data: userData } = usegetme();
+  const userRole = userData?.data?.role;
+  const isAdminOrAgent = userRole === "ADMIN" || userRole === "AGENT";
 
-const EyeIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-    <circle cx="12" cy="12" r="3" />
-  </svg>
-);
-
-interface PropertyCardProps {
-  property: Property;
-  isViewed: boolean;
-}
-
-const PropertyCard = ({ property, isViewed }: PropertyCardProps) => {
-  const { mutate: logView } = useLogViewedProperty();
-
-  const handleDetailsClick = () => {
-    logView(Number(property.id), {
-      onError: () => {
-        // تجاهل الخطأ في حال عدم تسجيل الدخول
-      },
-    });
-  };
-
-  const price = property.price
-    ? `${Number(property.price).toLocaleString()} EGP`
-    : "Contact Agent";
-
-  const locationText = property.city || property.location || "Egypt";
-
-  const isUnavailable = property.status !== "AVAILABLE";
-
-  const getStatusLabel = () => {
-    switch (property.status) {
-      case "RENTED":
-        return "RENTED";
-      case "SOLD":
-        return "SOLD";
-      default:
-        return property.status;
-    }
-  };
-
-  return (
-    <div
-      className={`group flex flex-col justify-between border transition-all duration-300 ${
-        isUnavailable
-          ? "border-gray-200 bg-[#F9F8F6]"
-          : "border-[#14213D]/20 bg-[#FFFDF9] hover:-translate-y-1 hover:border-[#B8863B] hover:shadow-xl"
-      }`}
-    >
-      <div>
-        <div className="relative overflow-hidden border-b border-[#14213D]/10">
-          <div
-            className={
-              isUnavailable ? "filter blur-[2px] grayscale contrast-125" : ""
-            }
-          >
-            <Imgcard propertyId={Number(property.id)} />
-          </div>
-
-          {property.type && (
-            <span
-              className={`${mono} absolute top-3 left-3 z-10 border border-[#14213D] bg-[#14213D] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-wider text-[#F7F5EF] shadow-md`}
-            >
-              {property.type}
-            </span>
-          )}
-
-          {/* علامة العين تظهر هنا تلقائياً بناءً على بيانات الـ API للمستخدم المسجل */}
-          {isViewed && (
-            <span
-              title="You viewed this property"
-              aria-label="Viewed"
-              className={`${mono} absolute top-3 right-3 z-30 flex items-center gap-1.5 border border-[#B8863B] bg-[#FFFDF9] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-wider text-[#B8863B] shadow-md`}
-            >
-              <EyeIcon className="h-4 w-4" />
-              <span>Viewed</span>
-            </span>
-          )}
-
-          {isUnavailable && (
-            <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#14213D]/40 backdrop-blur-[1px]">
-              <div className="border-2 border-[#FFFDF9] bg-[#B8452E] px-6 py-2 shadow-xl">
-                <span
-                  className={`${mono} text-sm font-bold tracking-[0.25em] text-[#FFFDF9] uppercase`}
-                >
-                  {getStatusLabel()}
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-3 p-5">
-          <p
-            className={`${mono} text-[10px] uppercase tracking-widest text-[#B8863B]`}
-          >
-            📍 {locationText}
-          </p>
-
-          <h2
-            className={`${serif} line-clamp-1 text-lg font-semibold text-[#14213D] transition ${
-              !isUnavailable && "group-hover:text-[#B8863B]"
-            }`}
-          >
-            {property.title}
-          </h2>
-
-          <p
-            className={`${mono} line-clamp-2 text-xs leading-relaxed text-[#4A5568]`}
-          >
-            {property.description}
-          </p>
-
-          <div
-            className={`${mono} flex flex-wrap gap-2 border-t border-dotted border-[#E4DFD3] pt-3 text-xs text-[#14213D]`}
-          >
-            {property.bedrooms !== undefined && property.bedrooms !== null && (
-              <span className="border border-[#E4DFD3] bg-[#F7F5EF] px-2.5 py-1 text-[11px]">
-                🛏️ {property.bedrooms} Beds
-              </span>
-            )}
-
-            {property.bathrooms !== undefined &&
-              property.bathrooms !== null && (
-                <span className="border border-[#E4DFD3] bg-[#F7F5EF] px-2.5 py-1 text-[11px]">
-                  🛁 {property.bathrooms} Baths
-                </span>
-              )}
-
-            {property.area !== undefined && property.area !== null && (
-              <span className="border border-[#E4DFD3] bg-[#F7F5EF] px-2.5 py-1 text-[11px]">
-                📐 {property.area} m²
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between border-t border-[#14213D]/10 bg-[#F7F5EF] p-4">
-        <div>
-          <span
-            className={`${mono} text-[9px] uppercase tracking-wider text-[#4A5568]`}
-          >
-            Valuation
-          </span>
-
-          <p className={`${serif} text-base font-bold text-[#14213D]`}>
-            {price}
-          </p>
-        </div>
-
-        <Link
-          to={`/properties/${property.id}`}
-          onClick={handleDetailsClick}
-          className={`${mono} flex items-center gap-1 border border-[#14213D] bg-[#14213D] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[#F7F5EF] transition-all hover:border-[#B8863B] hover:bg-[#B8863B]`}
-        >
-          <span>Details</span>
-          <span>→</span>
-        </Link>
-      </div>
-    </div>
-  );
-};
-
-const Properties = () => {
-  const [activeTab, setActiveTab] = useState<"SALE" | "RENT">("SALE");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-
-  // 2. جلب بيانات المستخدم المسجل دخوله ديناميكياً
-  const { data: currentUser } = usegetme();
-  console.log(currentUser)
-  const currentUserId = currentUser?.data.userId;
-
+  // جلب العقارات بحد كبير (100) لجلب كافة العناصر وتطبيق البحث والفلترة محلياً بدقة
   const { data, isLoading, isError } = usegetallprop({
-    page: currentPage,
-    limit: itemsPerPage,
-    type: activeTab,
-    status: "AVAILABLE",
+    limit: 100,
   });
 
-  // 3. تمرير الـ userId الفعلي لجلب المشاهدات الخاصة به فقط
-  const { data: viewedPropsData } = useGetViewedPropertiesByUser(currentUserId);
+  const rawProperties: any[] = Array.isArray(data?.data)
+    ? data.data
+    : data?.data?.properties || [];
 
-  // استخراج الـ IDs الخاصة بالعقارات المشاهدة
-  const viewedPropertyIds = Array.isArray(viewedPropsData)
-    ? viewedPropsData.map((item: any) => Number(item.propertyId))
-    : [];
+  // استخراج قائمة المدن الفريدة للقائمة المنسدلة من جميع العقارات
+  const availableCities = useMemo(() => {
+    const cities = rawProperties
+      .map((p) => p.city || p.location)
+      .filter((city): city is string => Boolean(city) && city.trim() !== "");
+    return Array.from(new Set(cities));
+  }, [rawProperties]);
 
-  const properties: Property[] = data?.data ?? [];
+  // تطبيق الفلترة والبحث محلياً لضمان استجابة البحث الفوري بدقة
+  const filteredProperties = useMemo(() => {
+    return rawProperties.filter((p) => {
+      // فلتر الحالة
+      if (selectedStatus && p.status !== selectedStatus) {
+        return false;
+      }
 
-  const totalItems: number = properties.length;
-  const totalPages: number =
-    data?.totalPages ?? Math.ceil(totalItems / itemsPerPage);
+      // فلتر نوع العقار (SALE / RENT)
+      if (selectedType) {
+        const pType = p.listingType || p.type;
+        if (pType !== selectedType) return false;
+      }
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [activeTab]);
+      // فلتر المدينة
+      if (selectedCity) {
+        const pCity = p.city || p.location || "";
+        if (pCity !== selectedCity) return false;
+      }
 
-  const handlePageChange = (page: number) => {
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+      // فلتر البحث النصي في العنوان، الوصف، أو المدينة
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase().trim();
+        const title = (p.title || "").toLowerCase();
+        const desc = (p.description || "").toLowerCase();
+        const city = (p.city || p.location || "").toLowerCase();
+        if (!title.includes(query) && !desc.includes(query) && !city.includes(query)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [rawProperties, selectedStatus, selectedType, selectedCity, searchQuery]);
+
+  // تطبيق الـ Pagination محلياً على النتائج المصفاة
+  const totalPages = Math.ceil(filteredProperties.length / limit) || 1;
+  const properties = useMemo(() => {
+    const start = (page - 1) * limit;
+    return filteredProperties.slice(start, start + limit);
+  }, [filteredProperties, page, limit]);
+
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setSelectedType("");
+    setSelectedStatus("AVAILABLE");
+    setSelectedCity("");
+    setPage(1);
   };
-
-  const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-
-  const getPageNumbers = () => {
-    if (totalPages <= 7) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-
-    if (currentPage <= 4) {
-      return [1, 2, 3, 4, "...", totalPages - 2, totalPages - 1, totalPages];
-    }
-
-    if (currentPage >= totalPages - 3) {
-      return [
-        1,
-        2,
-        3,
-        "...",
-        totalPages - 3,
-        totalPages - 2,
-        totalPages - 1,
-        totalPages,
-      ];
-    }
-
-    return [
-      1,
-      2,
-      3,
-      "...",
-      currentPage,
-      "...",
-      totalPages - 2,
-      totalPages - 1,
-      totalPages,
-    ];
-  };
-
-  if (isLoading) {
-    return (
-      <div className="mx-auto max-w-7xl space-y-8 p-4">
-        <div className="h-20 animate-pulse border-b border-[#14213D] bg-[#F7F5EF]" />
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="h-96 animate-pulse border border-[#14213D]/20 bg-[#FFFDF9]"
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center border border-[#B8452E] bg-[#FFFDF9] p-6 text-center">
-        <div>
-          <span className="text-2xl">⚠️</span>
-          <h2 className={`${serif} mt-2 text-lg font-semibold text-[#B8452E]`}>
-            Failed to load properties
-          </h2>
-          <p className={`${mono} mt-1 text-xs text-[#4A5568]`}>
-            We couldn't retrieve the estate catalog. Please try again later.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
-      {/* Header Section */}
-      <div className="flex flex-col gap-6 border-b border-[#14213D]/20 pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <span
-            className={`${mono} text-[10px] uppercase tracking-[0.2em] text-[#B8863B]`}
-          >
-            Estate Collection
-          </span>
+    <div className="min-h-screen bg-stone-50 text-stone-900 antialiased">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-stone-900">
+        <img
+          src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-40"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/50 to-transparent" />
 
-          <h1 className={`${serif} text-3xl font-semibold text-[#14213D]`}>
-            Curated Properties
+        <div className="relative mx-auto max-w-4xl px-4 py-20 text-center sm:py-28">
+          <span className="inline-block rounded-full bg-amber-800/80 px-4 py-1 text-xs font-medium uppercase tracking-wider text-amber-100 backdrop-blur">
+            Explore Catalog
+          </span>
+          <h1 className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-6xl">
+            Find Your <span className="text-amber-300">Perfect Property</span>
           </h1>
-
-          <p className={`${mono} mt-1 text-xs text-[#4A5568]`}>
-            Explore our exclusive collection categorized for sale and rent.
+          <p className="mx-auto mt-5 max-w-xl text-stone-300">
+            Browse through our verified listings of modern apartments, houses, and villas across Egypt.
           </p>
         </div>
+      </section>
 
-        {/* Tab Switcher */}
-        <div className="flex border border-[#14213D] bg-[#EFEAE0]/50 p-1">
-          <button
-            type="button"
-            onClick={() => setActiveTab("SALE")}
-            className={`${mono} px-5 py-2 text-xs font-bold uppercase tracking-wider transition ${
-              activeTab === "SALE"
-                ? "bg-[#14213D] text-[#FFFDF9] shadow-sm"
-                : "text-[#14213D] hover:bg-[#FFFDF9]"
-            }`}
-          >
-            For Sale
-          </button>
+      {/* Filter & Search Bar Section */}
+      <section className="mx-auto max-w-7xl px-4 py-8">
+        <div className="rounded-3xl border border-stone-100 bg-white p-6 shadow-sm space-y-4">
+          <div className="grid gap-4 md:grid-cols-4">
+            {/* Search Input */}
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-stone-700">
+                Search
+              </label>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
+                placeholder="Title, address..."
+                className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition focus:border-amber-800 focus:bg-white focus:ring-1 focus:ring-amber-800"
+              />
+            </div>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab("RENT")}
-            className={`${mono} px-5 py-2 text-xs font-bold uppercase tracking-wider transition ${
-              activeTab === "RENT"
-                ? "bg-[#14213D] text-[#FFFDF9] shadow-sm"
-                : "text-[#14213D] hover:bg-[#FFFDF9]"
-            }`}
-          >
-            For Rent
-          </button>
+            {/* City Dropdown Filter */}
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-stone-700">
+                City / Location
+              </label>
+              <select
+                value={selectedCity}
+                onChange={(e) => { setSelectedCity(e.target.value); setPage(1); }}
+                className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition focus:border-amber-800 focus:bg-white focus:ring-1 focus:ring-amber-800"
+              >
+                <option value="">All Cities</option>
+                {availableCities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Type Filter */}
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-stone-700">
+                Listing Type
+              </label>
+              <select
+                value={selectedType}
+                onChange={(e) => { setSelectedType(e.target.value); setPage(1); }}
+                className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition focus:border-amber-800 focus:bg-white focus:ring-1 focus:ring-amber-800"
+              >
+                <option value="">All Types</option>
+                <option value="SALE">For Sale</option>
+                <option value="RENT">For Rent</option>
+              </select>
+            </div>
+
+            {/* Status Filter */}
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-stone-700">
+                Status
+              </label>
+              <select
+                value={selectedStatus}
+                onChange={(e) => { setSelectedStatus(e.target.value); setPage(1); }}
+                className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition focus:border-amber-800 focus:bg-white focus:ring-1 focus:ring-amber-800"
+              >
+                <option value="">All Statuses</option>
+                <option value="AVAILABLE">Available</option>
+                <option value="SOLD">Sold</option>
+                {isAdminOrAgent && <option value="PENDING">Pending</option>}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <button
+              onClick={handleResetFilters}
+              className="cursor-pointer text-xs font-medium text-stone-500 hover:text-amber-800 transition"
+            >
+              Reset Filters ↺
+            </button>
+          </div>
         </div>
-      </div>
-
-      {/* Sub-Header Controls */}
-      <div className="flex items-center justify-end gap-4">
-        <div className="border border-[#14213D] bg-[#F7F5EF] px-4 py-2 text-right">
-          <span
-            className={`${mono} text-[10px] uppercase tracking-widest text-[#4A5568]`}
-          >
-            {activeTab === "SALE" ? "Sale Listings" : "Rental Listings"}
-          </span>
-
-          <p className={`${serif} text-lg font-bold text-[#14213D]`}>
-            {totalItems}
-          </p>
-        </div>
-      </div>
+      </section>
 
       {/* Properties Grid */}
-      {properties.length === 0 ? (
-        <div className="flex min-h-[300px] items-center justify-center border border-dashed border-[#14213D]/40 bg-[#FFFDF9] p-10 text-center">
-          <div>
-            <span className="text-3xl">🏛️</span>
-            <h2 className={`${serif} mt-3 text-xl font-medium text-[#14213D]`}>
-              No {activeTab === "SALE" ? "Sale" : "Rental"} Properties Found
-            </h2>
-            <p className={`${mono} mt-1 text-xs text-[#4A5568]`}>
-              There are currently no listings matching this criteria.
-            </p>
+      <section className="mx-auto max-w-7xl px-4 pb-20">
+        {isLoading ? (
+          <div className="grid gap-6 md:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-80 animate-pulse rounded-2xl bg-stone-100" />
+            ))}
           </div>
-        </div>
-      ) : (
-        <>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {properties.map((property) => {
-              const isViewed = viewedPropertyIds.includes(Number(property.id));
-              return (
-                <PropertyCard
-                  key={property.id}
-                  property={property}
-                  isViewed={isViewed}
-                />
-              );
-            })}
+        ) : isError ? (
+          <p className="py-16 text-center text-rose-600">Unable to fetch properties right now.</p>
+        ) : properties.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-stone-200 bg-white p-12 text-center shadow-sm">
+            <span className="text-4xl">🏠</span>
+            <h3 className="mt-3 text-lg font-semibold text-stone-900">No properties found</h3>
+            <p className="mt-1 text-sm text-stone-500">Try adjusting your search or filter parameters.</p>
           </div>
+        ) : (
+          <>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {properties.map((p) => {
+                const isRent = p.listingType === "RENT" || p.type === "RENT";
+                const specs = [
+                  p.bedrooms !== undefined && `🛏 ${p.bedrooms}`,
+                  p.bathrooms !== undefined && `🛁 ${p.bathrooms}`,
+                  p.area !== undefined && `📐 ${p.area} m²`,
+                ].filter(Boolean).join("  ·  ");
 
-          {/* PAGINATION BAR */}
-          {totalPages > 1 && (
-            <div className="mt-12 flex flex-col items-center gap-4 border-t border-[#14213D]/10 pt-8 sm:flex-row sm:justify-between">
-              <div className={`${mono} text-xs text-[#4A5568]`}>
-                Showing{" "}
-                <span className="font-semibold text-[#14213D]">
-                  {startItem}
-                </span>{" "}
-                to{" "}
-                <span className="font-semibold text-[#14213D]">{endItem}</span>{" "}
-                of{" "}
-                <span className="font-semibold text-[#14213D]">
-                  {totalItems}
-                </span>{" "}
-                Properties
-              </div>
+                return (
+                  <Link
+                    key={p.id}
+                    to={`/properties/${p.id}`}
+                    className="group block text-stone-900 overflow-hidden rounded-2xl border no-underline border-stone-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                  >
+                    <div className="relative">
+                      <Imgcard propertyId={p.id} />
+                      <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-stone-700 backdrop-blur">
+                        {isRent ? "For rent" : "For sale"}
+                      </span>
+                    </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className={`${mono} flex items-center gap-1.5 border border-[#14213D]/20 bg-[#FFFDF9] px-3.5 py-2 text-xs font-semibold text-[#14213D] transition-all hover:border-[#14213D] hover:bg-[#14213D] hover:text-[#FFFDF9] disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400`}
-                  title="Previous Page"
-                >
-                  <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span>Prev</span>
-                </button>
-
-                <div className="flex items-center gap-1 rounded-sm border border-[#14213D]/15 bg-[#F7F5EF] p-1">
-                  {getPageNumbers().map((page, index) => {
-                    if (page === "...") {
-                      return (
-                        <span
-                          key={`ellipsis-${index}`}
-                          className={`${mono} flex h-8 min-w-[32px] select-none items-center justify-center text-xs font-bold text-[#4A5568]`}
-                        >
-                          ...
+                    <div className="space-y-2 p-5">
+                      <p className="text-xs text-stone-500">📍 {p.city || p.location || "Egypt"}</p>
+                      <h3 className="truncate text-lg font-semibold">{p.title}</h3>
+                      <p className="line-clamp-2 text-sm text-stone-500">{p.description}</p>
+                      <div className="flex items-center justify-between pt-2">
+                        <span className="font-semibold text-amber-800">
+                          {p.price?.toLocaleString()} EGP
+                          {isRent && <span className="text-xs font-normal text-stone-400"> /mo</span>}
                         </span>
-                      );
-                    }
-
-                    const pageNum = Number(page);
-                    const isActive = currentPage === pageNum;
-
-                    return (
-                      <button
-                        key={pageNum}
-                        type="button"
-                        onClick={() => handlePageChange(pageNum)}
-                        className={`${mono} h-8 min-w-[32px] text-xs font-bold transition-all ${
-                          isActive
-                            ? "bg-[#14213D] text-[#FFFDF9] shadow-sm"
-                            : "text-[#14213D] hover:bg-[#EFEAE0]"
-                        }`}
-                      >
-                        {pageNum < 10 ? `0${pageNum}` : pageNum}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className={`${mono} flex items-center gap-1.5 border border-[#14213D]/20 bg-[#FFFDF9] px-3.5 py-2 text-xs font-semibold text-[#14213D] transition-all hover:border-[#14213D] hover:bg-[#14213D] hover:text-[#FFFDF9] disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400`}
-                  title="Next Page"
-                >
-                  <span>Next</span>
-                  <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </div>
+                        <span className="text-xs text-stone-500">{specs}</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
-          )}
-        </>
-      )}
+
+            {/* Pagination Controls */}
+            <div className="mt-12 flex items-center justify-center gap-4">
+              <button
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                disabled={page === 1}
+                className="rounded-xl border border-stone-200 bg-white px-5 py-2.5 text-xs font-medium text-stone-700 transition hover:bg-stone-50 disabled:opacity-40 cursor-pointer"
+              >
+                ← Previous
+              </button>
+
+              <span className="text-xs font-medium text-stone-600">
+                Page {page} of {totalPages || 1}
+              </span>
+
+              <button
+                onClick={() => setPage((prev) => prev + 1)}
+                disabled={page >= totalPages}
+                className="rounded-xl border border-stone-200 bg-white px-5 py-2.5 text-xs font-medium text-stone-700 transition hover:bg-stone-50 disabled:opacity-40 cursor-pointer"
+              >
+                Next →
+              </button>
+            </div>
+          </>
+        )}
+      </section>
     </div>
   );
 };

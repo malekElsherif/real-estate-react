@@ -5,40 +5,27 @@ import AgentHandleerrors from "./AgentHandleerrors";
 import AgentRecentProperties from "./AgentRecentProperties";
 import AgentRecentRequests from "./AgentRecentRequest";
 
-// Font Imports matching the classic estate theme
-const FontImports = () => (
-  <style>{`@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');`}</style>
-);
-
-const serif = "[font-family:'Fraunces',serif]";
-const mono = "[font-family:'IBM_Plex_Mono',monospace]";
-
 export const AgentDashboard = () => {
   const { isError: meError } = usegetme();
-
-  const {
-    isError: requestsError,
-  } = usegetpurchaseRequestsformyProperties();
+  const { isError: requestsError } = usegetpurchaseRequestsformyProperties();
 
   if (meError || requestsError) {
     return <AgentHandleerrors />;
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFDF9] py-8 text-[#14213D] antialiased">
-      <FontImports />
-
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-stone-50 py-8 text-stone-900 antialiased">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
 
         {/* Header Section */}
-        <div className="mb-8 border-b border-[#14213D] pb-6">
-          <span className={`${mono} text-xs uppercase tracking-[0.25em] text-[#B8863B]`}>
+        <div className="border-b border-stone-200 pb-6">
+          <span className="text-xs font-semibold uppercase tracking-wider text-amber-800">
             Agent Portal
           </span>
-          <h1 className={`${serif} mt-1 text-3xl font-semibold text-[#14213D] sm:text-4xl`}>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">
             Dashboard Overview
           </h1>
-          <p className="mt-1 text-sm text-[#4A5568]">
+          <p className="mt-1 text-sm text-stone-500">
             Manage your recent property listings and buyer requests.
           </p>
         </div>

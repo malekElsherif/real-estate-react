@@ -3,11 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { usegetPendingpurchaseRequests } from "../../hooks/usepurchase-requests";
 import HandlePurchaseRequest from "./HandleApproveRequest";
 import { usegetrentalrequestsformyproperties } from "../../hooks/userental-requests";
-// إذا كان لديك مكون خاص بإدارة طلبات الإيجار يمكنك استيراده هنا، أو استخدام المكون المشترك
-// import HandleRentalRequest from "./HandleRentalRequest";
-
-const serif = "[font-family:'Fraunces',serif]";
-const mono = "[font-family:'IBM_Plex_Mono',monospace]";
 
 const AgentRequest = () => {
   const {
@@ -25,15 +20,10 @@ const AgentRequest = () => {
   } = usegetrentalrequestsformyproperties();
 
   const [activeTab, setActiveTab] = useState<"sale" | "rent">("sale");
-
-  // حالة لتخزين الـ IDs الخاصة بالطلبات المفتوحة (Collapsible)
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
-
   const navigate = useNavigate();
 
   const saleRequests = purchaseData?.data ?? [];
-
-  // التصحيح الهام هنا: استخدام filter بدلاً dari find لضمان جلب جميع الطلبات المعلقة
   const rentRequests = rentalData?.data?.filter(
     (rental: any) => rental?.status?.toUpperCase() === "PENDING"
   ) ?? [];
@@ -50,7 +40,6 @@ const AgentRequest = () => {
     }
   };
 
-  // دالة لتبديل حالة الفتح والإغلاق لكل طلب على حدة
   const toggleItem = (id: string) => {
     setOpenItems((prev) => ({
       ...prev,
@@ -59,17 +48,31 @@ const AgentRequest = () => {
   };
 
   if (isLoading) {
-    return <p className={`${mono} p-6 text-center text-sm`}>Loading {activeTab} requests...</p>;
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center rounded-2xl border border-stone-100 bg-white shadow-sm">
+        <div className="text-center">
+          <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-stone-200 border-t-amber-800" />
+          <p className="mt-3 text-xs uppercase tracking-wider text-stone-500">
+            Loading {activeTab} requests...
+          </p>
+        </div>
+      </div>
+    );
   }
 
   if (isError) {
     return (
-      <div className="p-6 text-center">
-        <p className={`${mono} text-sm text-red-600`}>Failed to load {activeTab} requests.</p>
+      <div className="rounded-2xl border border-rose-200 bg-white p-8 text-center shadow-sm">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-rose-200 text-xl text-rose-600">
+          ⚠️
+        </div>
+        <h3 className="mt-3 text-lg font-bold text-rose-600">
+          Failed to load {activeTab} requests.
+        </h3>
         <button
           type="button"
           onClick={handleRefetch}
-          className={`${mono} mt-2 border border-[#14213D] px-3 py-1 text-xs`}
+          className="mt-4 rounded-xl bg-amber-800 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-amber-950 cursor-pointer"
         >
           Try Again
         </button>
@@ -78,18 +81,18 @@ const AgentRequest = () => {
   }
 
   return (
-    <div className="space-y-4 p-4">
-      <h1 className={`${serif} text-2xl font-bold text-[#14213D]`}>Requests</h1>
+    <div className="space-y-6 p-4 max-w-7xl mx-auto text-stone-900">
+      <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Requests</h1>
 
-      {/* أزرار التقسيم (بيع / إيجار) */}
-      <div className="flex gap-2 border-b border-[#14213D] pb-2">
+      {/* Tabs (Sale / Rent) */}
+      <div className="flex gap-2 border-b border-stone-200 pb-3">
         <button
           type="button"
           onClick={() => setActiveTab("sale")}
-          className={`${mono} px-4 py-2 text-xs font-semibold uppercase transition ${
+          className={`rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-wider transition cursor-pointer ${
             activeTab === "sale"
-              ? "bg-[#14213D] text-[#F7F5EF]"
-              : "border border-[#14213D] bg-[#FFFDF9] text-[#14213D]"
+              ? "bg-stone-900 text-white shadow-sm"
+              : "border border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
           }`}
         >
           Sale ({saleRequests.length})
@@ -98,21 +101,29 @@ const AgentRequest = () => {
         <button
           type="button"
           onClick={() => setActiveTab("rent")}
-          className={`${mono} px-4 py-2 text-xs font-semibold uppercase transition ${
+          className={`rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-wider transition cursor-pointer ${
             activeTab === "rent"
-              ? "bg-[#14213D] text-[#F7F5EF]"
-              : "border border-[#14213D] bg-[#FFFDF9] text-[#14213D]"
+              ? "bg-stone-900 text-white shadow-sm"
+              : "border border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
           }`}
         >
           Rent ({rentRequests.length})
         </button>
       </div>
 
-      {/* عرض القائمة الحالية */}
+      {/* Requests List */}
       {currentRequests.length === 0 ? (
-        <p className={`${mono} py-6 text-center text-sm text-[#4A5568]`}>
-          No pending {activeTab} requests.
-        </p>
+        <div className="flex min-h-[250px] items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center shadow-sm">
+          <div>
+            <span className="text-3xl">📋</span>
+            <h2 className="mt-3 text-lg font-semibold text-stone-900">
+              No pending {activeTab} requests.
+            </h2>
+            <p className="mt-1 text-xs text-stone-500">
+              New customer requests will appear here when submitted.
+            </p>
+          </div>
+        </div>
       ) : (
         <div className="grid gap-4">
           {currentRequests.map((request: any) => {
@@ -123,41 +134,44 @@ const AgentRequest = () => {
             return (
               <div
                 key={request.id}
-                className="border border-[#14213D] bg-[#FFFDF9] transition-all"
+                className="rounded-2xl border border-stone-100 bg-white shadow-sm overflow-hidden transition-all"
               >
-                {/* الجزء الرئيسي للكرت */}
-                <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-                  {/* تفاصيل الطلب */}
-                  <div className="space-y-1">
+                {/* Main Card Header */}
+                <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-1.5 min-w-0">
                     <button
                       type="button"
                       onClick={() => userId && navigate(`/agent/customer-profile/${userId}`)}
-                      className={`${serif} font-semibold text-[#14213D] text-left transition hover:text-[#B8863B] hover:underline cursor-pointer`}
+                      className="font-bold text-stone-900 text-left truncate transition hover:text-amber-800 hover:underline cursor-pointer bg-transparent border-none p-0"
                       title="View Customer Profile"
                     >
                       {request.user?.name || request.user?.username || "Unknown User"}
                     </button>
 
-                    <p className={`${mono} text-xs text-[#4A5568]`}>
-                      Property: {property.title || "Untitled Property"}
+                    <p className="text-xs text-stone-600 truncate">
+                      Property: <span className="font-semibold text-stone-900">{property.title || "Untitled Property"}</span>
                     </p>
-                    <p className={`${mono} text-xs text-[#B8863B]`}>
+                    <p className="text-xs font-bold text-amber-800">
                       {activeTab === "sale" ? "Offer:" : "Rent Price:"}{" "}
-                      {request.offerPrice ? `${Number(request.offerPrice).toLocaleString()} EGP` : property.price ? `${Number(property.price).toLocaleString()} EGP` : "N/A"}
+                      {request.offerPrice
+                        ? `${Number(request.offerPrice).toLocaleString()} EGP`
+                        : property.price
+                        ? `${Number(property.price).toLocaleString()} EGP`
+                        : "N/A"}
                     </p>
                     {request.user?.email && (
-                      <p className={`${mono} text-xs text-[#4A5568]`}>
+                      <p className="text-xs text-stone-500 truncate">
                         Email: {request.user.email}
                       </p>
                     )}
                   </div>
 
-                  {/* الأزرار (فتح التفاصيل + زر الإدارة/الموافقة) */}
-                  <div className="flex items-center gap-3 pt-2 sm:pt-0">
+                  {/* Actions */}
+                  <div className="flex items-center gap-3 pt-2 sm:pt-0 shrink-0">
                     <button
                       type="button"
                       onClick={() => toggleItem(request.id)}
-                      className={`${mono} flex items-center gap-1.5 border border-[#14213D] bg-[#F7F5EF] px-3 py-2 text-xs font-semibold text-[#14213D] transition hover:bg-[#14213D] hover:text-[#F7F5EF]`}
+                      className="flex items-center gap-1.5 rounded-xl border border-stone-200 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-700 transition hover:bg-stone-900 hover:text-white cursor-pointer"
                     >
                       <span>{isOpen ? "Hide Property" : "View Property"}</span>
                       <span className={`transform transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
@@ -171,57 +185,57 @@ const AgentRequest = () => {
                   </div>
                 </div>
 
-                {/* قسم تفاصيل العقار المنسدل (Collapsible Details) */}
+                {/* Collapsible Details */}
                 {isOpen && (
-                  <div className="border-t border-[#14213D] bg-[#F7F5EF]/50 p-4 space-y-3 animate-fadeIn">
-                    <h3 className={`${serif} text-sm font-bold text-[#14213D] border-b border-[#E4DFD3] pb-1`}>
+                  <div className="border-t border-stone-100 bg-stone-50/60 p-5 space-y-4 animate-fadeIn">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-amber-800 border-b border-stone-200 pb-1.5">
                       Property Details
                     </h3>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-                      <div>
-                        <span className={`${mono} text-[#4A5568] block`}>Price:</span>
-                        <span className={`${mono} font-semibold text-[#14213D]`}>
+                      <div className="rounded-xl border border-stone-200 bg-white p-3">
+                        <span className="text-[10px] uppercase font-semibold text-stone-400 block">Price</span>
+                        <span className="font-bold text-stone-900 mt-0.5 block">
                           {property.price ? `${Number(property.price).toLocaleString()} EGP` : "N/A"}
                         </span>
                       </div>
 
-                      <div>
-                        <span className={`${mono} text-[#4A5568] block`}>Type:</span>
-                        <span className={`${mono} font-semibold text-[#14213D] uppercase`}>
+                      <div className="rounded-xl border border-stone-200 bg-white p-3">
+                        <span className="text-[10px] uppercase font-semibold text-stone-400 block">Type</span>
+                        <span className="font-bold text-stone-900 uppercase mt-0.5 block">
                           {property.type || "N/A"}
                         </span>
                       </div>
 
-                      <div>
-                        <span className={`${mono} text-[#4A5568] block`}>Location / Address:</span>
-                        <span className={`${mono} font-semibold text-[#14213D]`}>
+                      <div className="rounded-xl border border-stone-200 bg-white p-3">
+                        <span className="text-[10px] uppercase font-semibold text-stone-400 block">Location / Address</span>
+                        <span className="font-bold text-stone-900 mt-0.5 block truncate">
                           {property.address || property.location || "N/A"}
                         </span>
                       </div>
 
                       {property.area && (
-                        <div>
-                          <span className={`${mono} text-[#4A5568] block`}>Area:</span>
-                          <span className={`${mono} font-semibold text-[#14213D]`}>
+                        <div className="rounded-xl border border-stone-200 bg-white p-3">
+                          <span className="text-[10px] uppercase font-semibold text-stone-400 block">Area</span>
+                          <span className="font-bold text-stone-900 mt-0.5 block">
                             {property.area} m²
                           </span>
                         </div>
                       )}
 
                       {property.bedrooms && (
-                        <div>
-                          <span className={`${mono} text-[#4A5568] block`}>Bedrooms:</span>
-                          <span className={`${mono} font-semibold text-[#14213D]`}>
+                        <div className="rounded-xl border border-stone-200 bg-white p-3">
+                          <span className="text-[10px] uppercase font-semibold text-stone-400 block">Bedrooms</span>
+                          <span className="font-bold text-stone-900 mt-0.5 block">
                             {property.bedrooms}
                           </span>
                         </div>
                       )}
 
                       {property.bathrooms && (
-                        <div>
-                          <span className={`${mono} text-[#4A5568] block`}>Bathrooms:</span>
-                          <span className={`${mono} font-semibold text-[#14213D]`}>
+                        <div className="rounded-xl border border-stone-200 bg-white p-3">
+                          <span className="text-[10px] uppercase font-semibold text-stone-400 block">Bathrooms</span>
+                          <span className="font-bold text-stone-900 mt-0.5 block">
                             {property.bathrooms}
                           </span>
                         </div>
@@ -230,8 +244,8 @@ const AgentRequest = () => {
 
                     {property.description && (
                       <div className="pt-1">
-                        <span className={`${mono} text-[#4A5568] block mb-1`}>Description:</span>
-                        <p className={`${mono} text-xs text-[#14213D] leading-relaxed bg-[#FFFDF9] p-2.5 border border-[#E4DFD3]`}>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-stone-500 block mb-1.5">Description:</span>
+                        <p className="text-xs text-stone-700 leading-relaxed bg-white p-3.5 rounded-xl border border-stone-200 shadow-xs">
                           {property.description}
                         </p>
                       </div>

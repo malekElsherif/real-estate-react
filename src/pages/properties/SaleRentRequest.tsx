@@ -1,56 +1,28 @@
-import { useMakePurchaseRequests } from "../../hooks/usepurchase-requests";
 import toast from "react-hot-toast";
-// قم باستدعاء الـ Hook الخاص بالـ Auth لديك هنا
+import { useMakePurchaseRequests } from "../../hooks/usepurchase-requests";
 import { usegetme } from "../../hooks/useUsers";
+import { primary } from "../ui";
 
-const mono = "[font-family:'IBM_Plex_Mono',monospace]";
+const SaleRentRequest = ({ propertyId, type }: { propertyId: number; type: "SALE" | "RENT" }) => {
+  const { data: user } = usegetme();
+  const { mutate, isPending } = useMakePurchaseRequests(propertyId);
 
-type SaleRentRequestProps = {
-  propertyId: number;
-  type: "SALE" | "RENT";
-};
+  if (user?.data.role !== "USER") return null;
 
-const SaleRentRequest = ({
-  propertyId,
-  type,
-}: SaleRentRequestProps) => {
-  // جلب بيانات المستخدم لمعرفة الـ role
-  const { data:user } = usegetme();
-
-  const {
-    mutate,
-    isPending,
-  } = useMakePurchaseRequests(propertyId);
-
-  const handleRequest = () => {
-    mutate(undefined, {
-      onSuccess: () => {
-        toast.success(
-          `${type === "SALE" ? "Purchase" : "Rental"} request sent successfully`
-        );
-      },
-      onError: () => {
-        toast.error("You already requested this property");
-      },
-    });
-  };
-
-  // 🔴 شرط الظهور: يظهر فقط إذا كان المستخدم مسجلاً ولديه role يساوي "USER"
-  if (user?.data.role !== "USER") {
-    return null;
-  }
+  const label = type === "SALE" ? "Purchase" : "Rental";
 
   return (
     <button
-      onClick={handleRequest}
       disabled={isPending}
-      className={`${mono} w-full border border-[#14213D] bg-[#2D6A4F] py-3 text-xs font-semibold uppercase tracking-wider text-[#F7F5EF] transition hover:bg-[#1B4332] disabled:cursor-not-allowed disabled:opacity-60`}
+      onClick={() =>
+        mutate(undefined, {
+          onSuccess: () => toast.success(`${label} request sent successfully`),
+          onError: () => toast.error("You already requested this property"),
+        })
+      }
+      className={`${primary} w-full py-3`}
     >
-      {isPending
-        ? "Sending Request..."
-        : type === "SALE"
-          ? "Request to Purchase"
-          : "Request to Rent"}
+      {isPending ? "Sending…" : `Request to ${type === "SALE" ? "Purchase" : "Rent"}`}
     </button>
   );
 };

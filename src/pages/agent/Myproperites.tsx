@@ -6,13 +6,6 @@ import Imgcard from "../properties/Imgcard";
 import Editproperity from "../properties/Editproperity";
 import Deleteprop from "../properties/Deleteprop";
 
-const FontImports = () => (
-  <style>{`@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');`}</style>
-);
-
-const serif = "[font-family:'Fraunces',serif]";
-const mono = "[font-family:'IBM_Plex_Mono',monospace]";
-
 type FilterTab = "ALL" | "AVAILABLE" | "SALE" | "RENT" | "PENDING" | "SOLD_OR_RENTED";
 
 const Myproperites = () => {
@@ -39,12 +32,11 @@ const Myproperites = () => {
 
   if (meLoading || propertiesLoading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <FontImports />
+      <div className="flex min-h-[60vh] items-center justify-center text-stone-900">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#E4DFD3] border-t-[#14213D]" />
-          <p className={`${mono} text-xs uppercase tracking-widest text-[#4A5568]`}>
-            Retrieving listings
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-stone-200 border-t-amber-800" />
+          <p className="text-xs uppercase tracking-wider text-stone-500">
+            Retrieving listings...
           </p>
         </div>
       </div>
@@ -53,16 +45,15 @@ const Myproperites = () => {
 
   if (meError || propertiesError) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center px-4">
-        <FontImports />
-        <div className="max-w-sm border border-[#B8452E] bg-[#FFFDF9] px-8 py-10 text-center">
-          <p className={`${mono} text-xs uppercase tracking-widest text-[#B8452E]`}>
+      <div className="flex min-h-[60vh] items-center justify-center px-4 text-stone-900">
+        <div className="max-w-sm rounded-2xl border border-rose-200 bg-white p-8 text-center shadow-sm space-y-3">
+          <p className="text-xs uppercase tracking-wider text-rose-600 font-semibold">
             Error 01
           </p>
-          <p className={`${serif} mt-3 text-xl font-medium text-[#14213D]`}>
+          <p className="text-xl font-bold tracking-tight">
             Couldn't load your properties
           </p>
-          <p className="mt-2 text-sm text-[#4A5568]">
+          <p className="text-sm text-stone-500">
             Check your connection and try refreshing the page.
           </p>
         </div>
@@ -102,200 +93,189 @@ const Myproperites = () => {
   };
 
   return (
-    <div>
-      <FontImports />
+    <div className="mx-auto max-w-7xl text-stone-900 space-y-8">
+      {/* Header */}
+      <div className="flex flex-col gap-6 border-b border-stone-200 pb-6 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-amber-800">
+            Dashboard / Portfolio
+          </p>
 
-      <div className="mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="mb-8 flex flex-col gap-6 border-b border-[#14213D] pb-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className={`${mono} text-xs uppercase tracking-[0.25em] text-[#B8863B]`}>
-              Dashboard / Portfolio
-            </p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">
+            My Properties
+          </h1>
 
-            <h1 className={`${serif} mt-2 text-4xl font-semibold text-[#14213D] md:text-5xl`}>
-              My Properties
-            </h1>
+          <p className="mt-1 text-sm text-stone-500">
+            {properties.length > 0
+              ? `${properties.length} ${
+                  properties.length === 1 ? "listing" : "listings"
+                } under management`
+              : "Manage your listings"}
+          </p>
+        </div>
 
-            <p className="mt-2 text-sm text-[#4A5568]">
-              {properties.length > 0
-                ? `${properties.length} ${
-                    properties.length === 1 ? "listing" : "listings"
-                  } under management`
-                : "Manage your listings"}
-            </p>
-          </div>
+        <button
+          type="button"
+          onClick={() => navigate("/agent/add-property")}
+          className="w-fit rounded-xl bg-amber-800 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-amber-900 cursor-pointer"
+        >
+          + Add Property
+        </button>
+      </div>
 
+      {/* Filter Tabs */}
+      <div className="flex flex-wrap gap-2 border-b border-stone-200 pb-4">
+        {[
+          { id: "ALL", label: "All Properties", count: properties.length },
+          { id: "AVAILABLE", label: "Available", count: properties.filter((p: any) => !isSoldOrRentedProp(p) && p.status !== "PENDING").length },
+          { id: "SALE", label: "For Sale", count: properties.filter((p: any) => p.type === "SALE" && !isSoldOrRentedProp(p)).length },
+          { id: "RENT", label: "For Rent", count: properties.filter((p: any) => p.type === "RENT" && !isSoldOrRentedProp(p)).length },
+          { id: "SOLD_OR_RENTED", label: "Sold / Rented", count: properties.filter((p: any) => isSoldOrRentedProp(p)).length },
+          { id: "PENDING", label: "Pending Review", count: properties.filter((p: any) => p.status === "PENDING" || p.status === "UNDER_REVIEW").length },
+        ].map((tab) => (
           <button
-            type="button"
-            onClick={() => navigate("/agent/add-property")}
-            className="w-fit bg-[#14213D] px-6 py-3 text-sm font-semibold uppercase tracking-wider text-[#F7F5EF] transition-colors duration-150 hover:bg-[#B8863B]"
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as FilterTab)}
+            className={`rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+              activeTab === tab.id
+                ? "bg-stone-900 text-white shadow-xs"
+                : "border border-stone-200 bg-white text-stone-600 hover:bg-stone-50 hover:text-stone-900"
+            }`}
           >
-            + Add Property
+            {tab.label} <span className="opacity-75">({tab.count})</span>
           </button>
+        ))}
+      </div>
+
+      {/* Grid or Empty */}
+      {filteredProperties.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-white px-12 py-20 text-center shadow-xs">
+          <span className="text-4xl mb-3">🏠</span>
+          <h2 className="text-xl font-bold tracking-tight text-stone-900">
+            No properties found in this section
+          </h2>
+          <p className="mt-1 max-w-xs text-xs text-stone-500">
+            Try switching to another tab or add a new listing.
+          </p>
         </div>
+      ) : (
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {filteredProperties.map((property: any) => {
+            const isRent = property.type === "RENT";
+            const isSoldOrRented = isSoldOrRentedProp(property);
 
-        {/* Filter Tabs */}
-        <div className="mb-8 flex flex-wrap gap-2 border-b border-[#E4DFD3] pb-4">
-          {[
-            { id: "ALL", label: "All Properties", count: properties.length },
-            { id: "AVAILABLE", label: "Available", count: properties.filter((p: any) => !isSoldOrRentedProp(p) && p.status !== "PENDING").length },
-            { id: "SALE", label: "For Sale", count: properties.filter((p: any) => p.type === "SALE" && !isSoldOrRentedProp(p)).length },
-            { id: "RENT", label: "For Rent", count: properties.filter((p: any) => p.type === "RENT" && !isSoldOrRentedProp(p)).length },
-            { id: "SOLD_OR_RENTED", label: "Sold / Rented", count: properties.filter((p: any) => isSoldOrRentedProp(p)).length },
-            { id: "PENDING", label: "Pending Review", count: properties.filter((p: any) => p.status === "PENDING" || p.status === "UNDER_REVIEW").length },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as FilterTab)}
-              className={`${mono} border px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
-                activeTab === tab.id
-                  ? "border-[#14213D] bg-[#14213D] text-[#F7F5EF]"
-                  : "border-[#E4DFD3] bg-[#FFFDF9] text-[#4A5568] hover:border-[#14213D] hover:text-[#14213D]"
-              }`}
-            >
-              {tab.label} <span className="opacity-75">({tab.count})</span>
-            </button>
-          ))}
-        </div>
-
-        {filteredProperties.length === 0 ? (
-          <div className="flex flex-col items-center border border-dashed border-[#14213D] bg-[#FFFDF9] px-12 py-20 text-center">
-            <svg width="52" height="52" viewBox="0 0 52 52" fill="none" className="mb-5 text-[#14213D]">
-              <path d="M6 24L26 8L46 24" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M11 21V44H41V21" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M22 44V30H30V44" stroke="currentColor" strokeWidth="1.5" />
-            </svg>
-
-            <h2 className={`${serif} text-2xl font-medium text-[#14213D]`}>
-              No properties found in this section
-            </h2>
-
-            <p className="mt-2 max-w-xs text-sm text-[#4A5568]">
-              Try switching to another tab or add a new listing.
-            </p>
-          </div>
-        ) : (
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {filteredProperties.map((property: any) => {
-              const isRent = property.type === "RENT";
-              const isSoldOrRented = isSoldOrRentedProp(property);
-
-              return (
-                <div
-                  key={property.id}
-                  className="relative flex h-full flex-col border border-[#14213D] bg-[#FFFDF9]"
+            return (
+              <div
+                key={property.id}
+                className="group relative flex h-full flex-col rounded-2xl border border-stone-100 bg-white shadow-sm overflow-hidden transition"
+              >
+                {/* Image Link */}
+                <Link
+                  to={`/properties/${property.id}`}
+                  className="relative block h-56 shrink-0 bg-stone-100 overflow-hidden no-underline"
                 >
-                  <span className="pointer-events-none absolute -left-px -top-px h-2.5 w-2.5 border-l-[1.5px] border-t-[1.5px] border-[#14213D]" />
-                  <span className="pointer-events-none absolute -right-px -top-px h-2.5 w-2.5 border-r-[1.5px] border-t-[1.5px] border-[#14213D]" />
+                  <div className="transition-transform duration-300 group-hover:scale-105 h-full">
+                    <Imgcard propertyId={property.id} />
+                  </div>
 
-                  {/* Image */}
-                  <Link
-                    to={`/properties/${property.id}`}
-                    className="relative block h-56 shrink-0 border-b border-[#14213D] bg-[#EFEAE0] overflow-hidden group"
-                  >
-                    <div className="transition-transform duration-300 group-hover:scale-105 h-full">
-                      <Imgcard propertyId={property.id} />
-                    </div>
-
-                    {/* Status stamp / Badge */}
-                    {isSoldOrRented ? (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
-                        <div className={`${mono} rotate-[-12deg] rounded-md border border-white/40 bg-black/40 px-6 py-2 text-sm font-bold uppercase tracking-widest text-white backdrop-blur-md shadow-2xl`}>
-                          {isRent ? "Rented Out" : "Sold"}
-                        </div>
+                  {/* Status Stamp / Badge */}
+                  {isSoldOrRented ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-stone-900/40 pointer-events-none">
+                      <div className="rotate-[-12deg] rounded-xl border border-white/40 bg-stone-900/60 px-5 py-1.5 text-xs font-bold uppercase tracking-widest text-white backdrop-blur-xs shadow-md">
+                        {isRent ? "Rented Out" : "Sold"}
                       </div>
-                    ) : (
-                      <span
-                        className={`${mono} absolute right-4 top-4 -rotate-[7deg] border-[1.5px] border-dashed bg-[#FFFDF9]/90 px-3 py-1 text-[11px] font-medium uppercase tracking-widest ${
-                          isRent ? "text-[#5B7B65]" : "text-[#B8452E]"
-                        }`}
-                      >
-                        {isRent ? "For Rent" : "For Sale"}
-                      </span>
-                    )}
-                  </Link>
+                    </div>
+                  ) : (
+                    <span
+                      className={`absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wider shadow-xs ${
+                        isRent
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          : "bg-rose-50 text-rose-600 border border-rose-200"
+                      }`}
+                    >
+                      {isRent ? "For Rent" : "For Sale"}
+                    </span>
+                  )}
+                </Link>
 
-                  {/* Content wrapper */}
-                  <div className="flex flex-1 flex-col p-6 pt-8">
-                    <p className={`${mono} text-[11px] uppercase tracking-[0.2em] text-[#B8863B]`}>
-                      {property.city || property.location || "Egypt"}
+                {/* Content Wrapper */}
+                <div className="flex flex-1 flex-col p-6 space-y-4">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-800">
+                      📍 {property.city || property.location || "Egypt"}
                     </p>
 
-                    <Link to={`/properties/${property.id}`}>
+                    <Link to={`/properties/${property.id}`} className="no-underline">
                       <h2
                         title={property.title}
-                        className={`${serif} mt-2 line-clamp-1 text-xl font-semibold text-[#14213D] hover:text-[#B8863B] transition-colors`}
+                        className="mt-1 line-clamp-1 text-lg font-bold text-stone-900 hover:text-amber-800 transition"
                       >
                         {property.title}
                       </h2>
                     </Link>
 
-                    <div className="mt-2 flex-1">
-                      <p className="line-clamp-2 text-sm leading-6 text-[#4A5568]">
-                        {property.description}
-                      </p>
+                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-stone-500">
+                      {property.description}
+                    </p>
+                  </div>
+
+                  {/* Spec Sheet */}
+                  <div className="text-xs text-stone-600 space-y-1.5 border-t border-stone-100 pt-3">
+                    <div className="flex justify-between border-b border-stone-100 pb-1">
+                      <span>Bedrooms</span>
+                      <span className="font-semibold text-stone-900">{property.bedrooms}</span>
                     </div>
-
-                    {/* Spec sheet */}
-                    <div className={`${mono} mt-4 text-xs text-[#4A5568]`}>
-                      <div className="flex justify-between border-b border-dotted border-[#E4DFD3] py-1.5">
-                        <span>Bedrooms</span>
-                        <span className="font-medium text-[#14213D]">{property.bedrooms}</span>
-                      </div>
-                      <div className="flex justify-between border-b border-dotted border-[#E4DFD3] py-1.5">
-                        <span>Bathrooms</span>
-                        <span className="font-medium text-[#14213D]">{property.bathrooms}</span>
-                      </div>
-                      <div className="flex justify-between py-1.5">
-                        <span>Area</span>
-                        <span className="font-medium text-[#14213D]">{property.area} m²</span>
-                      </div>
+                    <div className="flex justify-between border-b border-stone-100 pb-1">
+                      <span>Bathrooms</span>
+                      <span className="font-semibold text-stone-900">{property.bathrooms}</span>
                     </div>
-
-                    {/* Price & Actions section */}
-                    <div className="mt-auto border-t border-[#E4DFD3] pt-5">
-                      <p className={`${mono} mb-4 text-2xl font-medium text-[#B8863B]`}>
-                        {property.price}
-                      </p>
-
-                      {isAgentOrAdmin ? (
-                        <div className="mb-3 rounded border border-dashed border-[#B8863B] bg-[#F7F5EF] p-2 text-center">
-                          <p className={`${mono} text-[10px] uppercase text-[#B8863B]`}>
-                            ★ Managed Property ({userRole})
-                          </p>
-                        </div>
-                      ) : null}
-
-                      <div className="flex gap-3">
-                        <button
-                          type="button"
-                          onClick={() => handleEdit(property.id)}
-                          className="flex-1 border border-[#14213D] py-2.5 text-xs font-semibold uppercase tracking-wider text-[#14213D] transition-colors duration-150 hover:bg-[#14213D] hover:text-[#F7F5EF]"
-                        >
-                          Edit
-                        </button>
-
-                        <div className="flex">
-                          <Deleteprop id={property.id} />
-                        </div>
-                      </div>
-
-                      <Link
-                        to={`/agent/properties/${property.id}/images`}
-                        className="mt-3 flex items-center justify-center gap-1.5 bg-[#EFEAE0] border border-[#E4DFD3] py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-[#14213D] transition-colors duration-150 hover:bg-[#14213D] hover:text-[#F7F5EF] hover:border-[#14213D]"
-                      >
-                        Manage Images
-                        <span aria-hidden="true">→</span>
-                      </Link>
+                    <div className="flex justify-between pb-1">
+                      <span>Area</span>
+                      <span className="font-semibold text-stone-900">{property.area} m²</span>
                     </div>
                   </div>
+
+                  {/* Price & Actions */}
+                  <div className="mt-auto border-t border-stone-100 pt-4 space-y-3">
+                    <p className="text-xl font-bold text-amber-800">
+                      {property.price?.toLocaleString() ?? 0} EGP
+                    </p>
+
+                    {isAgentOrAdmin && (
+                      <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-2 text-center">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-800">
+                          ★ Managed Property ({userRole})
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(property.id)}
+                        className="flex-1 rounded-xl border border-stone-200 bg-white py-2 text-xs font-semibold uppercase tracking-wider text-stone-700 transition hover:bg-stone-900 hover:text-white cursor-pointer"
+                      >
+                        Edit
+                      </button>
+
+                      <div className="flex shrink-0">
+                        <Deleteprop id={property.id} />
+                      </div>
+                    </div>
+
+                    <Link
+                      to={`/agent/properties/${property.id}/images`}
+                      className="flex items-center justify-center gap-1.5 rounded-xl border border-stone-200 bg-stone-50 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-stone-700 no-underline transition hover:bg-amber-800 hover:text-white hover:border-amber-800"
+                    >
+                      Manage Images →
+                    </Link>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Edit Dialog */}
       {selectedPropertyId !== null && (

@@ -2,21 +2,14 @@ import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
-const Layout = () => {
-  return (
-    <div className="flex min-h-screen flex-col bg-[#FFFDF9] text-[#14213D] antialiased">
-      {/* Navigation Header */}
-      <Navbar />
-
-      {/* Main Content Area */}
-      <main className="flex-1">
-        <Outlet />
-      </main>
-
-      {/* Global Architectural Footer */}
-      <Footer />
-    </div>
-  );
-};
+const Layout = () => (
+  <div className="flex min-h-screen flex-col bg-stone-50 text-stone-900 antialiased">
+    <Navbar />
+    <main className="flex-1">
+      <Outlet />
+    </main>
+    <Footer />
+  </div>
+);
 
 export default Layout;

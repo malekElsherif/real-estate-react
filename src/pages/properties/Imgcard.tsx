@@ -1,42 +1,23 @@
 import { usegetimgbyid } from "../../hooks/usefiles";
-type ImgcardProps = { propertyId: number };
-const Imgcard = ({ propertyId }: ImgcardProps) => {
+
+const BASE = "https://real-estate-nest-production.up.railway.app";
+
+const Imgcard = ({ propertyId, className = "h-56" }: { propertyId: number; className?: string }) => {
   const { data, isLoading, isError } = usegetimgbyid(propertyId);
-  console.log("img", data);
-  if (isLoading) {
-    return (
-      <div className="flex h-64 w-full items-center justify-center bg-slate-100">
-        {" "}
-        <span className="text-slate-500">Loading...</span>{" "}
-      </div>
-    );
-  }
-  if (isError) {
-    return (
-      <div className="flex h-64 w-full items-center justify-center bg-slate-100">
-        {" "}
-        <span className="text-red-500">Failed to load image</span>{" "}
-      </div>
-    );
-  }
-  const images = Array.isArray(data) ? data : [];
+  const list = Array.isArray(data) ? data : (data as any)?.data;
+  const url = Array.isArray(list) ? list[0]?.url : undefined;
+
   return (
-    <div className="h-64 w-full overflow-hidden bg-slate-100">
-      {" "}
-      {images.length > 0 && images[0]?.url ? (
-        <img
-          src={`https://real-estate-nest-production.up.railway.app${images[0].url}`}
-          alt="Property"
-          className="h-full w-full object-cover"
-          loading="lazy"
-        />
+    <div className={`w-full overflow-hidden bg-stone-100 ${className}`}>
+      {url ? (
+        <img src={BASE + url} alt="Property" loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
       ) : (
-        <div className="flex h-full items-center justify-center">
-          {" "}
-          <span className="text-5xl">🏠</span>{" "}
+        <div className="grid h-full place-items-center text-sm text-stone-400">
+          {isLoading ? "Loading…" : isError ? "Failed to load image" : <span className="text-4xl">🏠</span>}
         </div>
-      )}{" "}
+      )}
     </div>
   );
 };
+
 export default Imgcard;

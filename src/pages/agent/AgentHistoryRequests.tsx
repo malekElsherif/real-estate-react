@@ -1,10 +1,7 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { usegetpurchaseRequestsformyProperties } from "../../hooks/usepurchase-requests";
 import { usegetrentalrequestsformyproperties } from "../../hooks/userental-requests";
-
-const serif = "[font-family:'Fraunces',serif]";
-const mono = "[font-family:'IBM_Plex_Mono',monospace]";
 
 const AgentHistoryRequests = () => {
   const {
@@ -90,13 +87,10 @@ const AgentHistoryRequests = () => {
   // Loading
   if (isLoading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center border border-[#14213D] bg-[#FFFDF9]">
+      <div className="flex min-h-[40vh] items-center justify-center rounded-2xl border border-stone-100 bg-white shadow-sm">
         <div className="text-center">
-          <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-[#E4DFD3] border-t-[#14213D]" />
-
-          <p
-            className={`${mono} mt-3 text-xs uppercase tracking-widest text-[#4A5568]`}
-          >
+          <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-stone-200 border-t-amber-800" />
+          <p className="mt-3 text-xs uppercase tracking-wider text-stone-500">
             Loading request archive...
           </p>
         </div>
@@ -107,58 +101,47 @@ const AgentHistoryRequests = () => {
   // Error
   if (isError) {
     return (
-      <div className="border border-[#B8452E] bg-[#FFFDF9] p-8 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center border border-[#B8452E] text-xl text-[#B8452E]">
+      <div className="rounded-2xl border border-rose-200 bg-white p-8 text-center shadow-sm">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-rose-200 text-xl text-rose-600">
           ⚠️
         </div>
-
-        <h3
-          className={`${serif} mt-3 text-lg font-semibold text-[#B8452E]`}
-        >
+        <h3 className="mt-3 text-lg font-bold text-rose-600">
           Failed to load request history
         </h3>
-
-        <p className={`${mono} mt-1 text-xs text-[#4A5568]`}>
-          {error?.message ||
-            "An error occurred while fetching archival requests."}
+        <p className="mt-1 text-xs text-stone-500">
+          {error?.message || "An error occurred while fetching archival requests."}
         </p>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-4">
+    <div className="mx-auto max-w-7xl space-y-6 p-4 text-stone-900">
       {/* Header */}
-      <div className="flex flex-col gap-4 border-b border-[#14213D] pb-6 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-stone-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <span
-            className={`${mono} text-[10px] uppercase tracking-[0.2em] text-[#B8863B]`}
-          >
+          <span className="text-xs font-semibold uppercase tracking-wider text-amber-800">
             Archival Log
           </span>
-
-          <h1
-            className={`${serif} text-2xl font-semibold text-[#14213D] md:text-3xl`}
-          >
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
             Request History
           </h1>
-
-          <p className={`${mono} mt-1 text-xs text-[#4A5568]`}>
+          <p className="mt-1 text-xs text-stone-500">
             Processed estate purchase and rental transactions (Latest first).
           </p>
         </div>
 
         {/* Filters */}
         <div className="flex items-center gap-3">
-          <div className="flex border border-[#14213D] bg-[#F7F5EF] p-1">
+          <div className="flex rounded-xl border border-stone-200 bg-stone-50 p-1">
             {/* ALL */}
             <button
               type="button"
               onClick={() => setFilterStatus("ALL")}
-              className={`${mono} px-3 py-1 text-[10px] font-semibold uppercase tracking-wider transition ${
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition cursor-pointer ${
                 filterStatus === "ALL"
-                  ? "bg-[#14213D] text-[#F7F5EF]"
-                  : "text-[#14213D] hover:bg-[#E4DFD3]"
+                  ? "bg-stone-900 text-white shadow-sm"
+                  : "text-stone-700 hover:bg-stone-200/60"
               }`}
             >
               All ({historyRequests.length})
@@ -168,10 +151,10 @@ const AgentHistoryRequests = () => {
             <button
               type="button"
               onClick={() => setFilterStatus("APPROVED")}
-              className={`${mono} px-3 py-1 text-[10px] font-semibold uppercase tracking-wider transition ${
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition cursor-pointer ${
                 filterStatus === "APPROVED"
-                  ? "bg-[#2D6A4F] text-[#F7F5EF]"
-                  : "text-[#2D6A4F] hover:bg-[#E4DFD3]"
+                  ? "bg-emerald-700 text-white shadow-sm"
+                  : "text-emerald-700 hover:bg-stone-200/60"
               }`}
             >
               Approved
@@ -181,10 +164,10 @@ const AgentHistoryRequests = () => {
             <button
               type="button"
               onClick={() => setFilterStatus("REJECTED")}
-              className={`${mono} px-3 py-1 text-[10px] font-semibold uppercase tracking-wider transition ${
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition cursor-pointer ${
                 filterStatus === "REJECTED"
-                  ? "bg-[#B8452E] text-[#F7F5EF]"
-                  : "text-[#B8452E] hover:bg-[#E4DFD3]"
+                  ? "bg-rose-600 text-white shadow-sm"
+                  : "text-rose-600 hover:bg-stone-200/60"
               }`}
             >
               Rejected
@@ -195,33 +178,25 @@ const AgentHistoryRequests = () => {
 
       {/* Empty */}
       {filteredRequests.length === 0 ? (
-        <div className="flex min-h-[250px] items-center justify-center border border-dashed border-[#14213D] bg-[#FFFDF9] p-8 text-center">
+        <div className="flex min-h-[250px] items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center shadow-sm">
           <div>
             <span className="text-3xl">📜</span>
-
-            <h2
-              className={`${serif} mt-3 text-lg font-medium text-[#14213D]`}
-            >
+            <h2 className="mt-3 text-lg font-semibold text-stone-900">
               No Archived Requests Found
             </h2>
-
-            <p className={`${mono} mt-1 text-xs text-[#4A5568]`}>
+            <p className="mt-1 text-xs text-stone-500">
               No requests match the selected filter criteria.
             </p>
           </div>
         </div>
       ) : (
         /* Requests */
-        <div className="border border-[#14213D] bg-[#FFFDF9]">
-          <div className="divide-y divide-[#E4DFD3]">
+        <div className="rounded-2xl border border-stone-100 bg-white shadow-sm overflow-hidden">
+          <div className="divide-y divide-stone-100">
             {filteredRequests.map((request) => {
-              const statusUpper = request.status
-                ?.trim()
-                .toUpperCase();
-
+              const statusUpper = request.status?.trim().toUpperCase();
               const isApproved =
-                statusUpper === "APPROVED" ||
-                statusUpper === "ACCEPTED";
+                statusUpper === "APPROVED" || statusUpper === "ACCEPTED";
 
               const customerName =
                 request.user?.name ||
@@ -235,14 +210,12 @@ const AgentHistoryRequests = () => {
               return (
                 <div
                   key={`${request.requestType}-${request.id}`}
-                  className="flex flex-col gap-4 p-5 transition hover:bg-[#F7F5EF] sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-4 p-5 transition hover:bg-stone-50 sm:flex-row sm:items-center sm:justify-between"
                 >
                   {/* Customer + Property */}
                   <div className="flex min-w-0 items-start gap-4">
                     {/* Avatar */}
-                    <div
-                      className={`${mono} flex h-10 w-10 shrink-0 items-center justify-center border border-[#14213D] bg-[#14213D] text-xs font-bold text-[#F7F5EF]`}
-                    >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-900 text-xs font-bold text-white">
                       {customerName.charAt(0).toUpperCase()}
                     </div>
 
@@ -252,31 +225,25 @@ const AgentHistoryRequests = () => {
                         {customerId ? (
                           <Link
                             to={`/agent/customer-profile/${customerId}`}
-                            className={`${serif} font-semibold text-[#14213D] transition hover:text-[#B8863B]`}
+                            className="font-semibold text-stone-900 no-underline transition hover:text-amber-800"
                           >
                             {customerName}
                           </Link>
                         ) : (
-                          <span
-                            className={`${serif} font-semibold text-[#14213D]`}
-                          >
+                          <span className="font-semibold text-stone-900">
                             {customerName}
                           </span>
                         )}
 
-                        <span
-                          className={`${mono} text-[10px] text-[#4A5568]`}
-                        >
+                        <span className="text-xs text-stone-500">
                           ({request.user?.email || "No email"})
                         </span>
                       </div>
 
                       {/* Property */}
-                      <p
-                        className={`${mono} text-xs text-[#14213D]`}
-                      >
+                      <p className="text-xs text-stone-700">
                         Property:{" "}
-                        <span className="font-semibold">
+                        <span className="font-semibold text-stone-900">
                           {request.property?.title ||
                             request.propertyTitle ||
                             "Untitled Estate"}
@@ -285,20 +252,12 @@ const AgentHistoryRequests = () => {
 
                       {/* Request Type + Date */}
                       <div className="flex flex-wrap items-center gap-3">
-                        <span
-                          className={`${mono} text-[10px] font-semibold uppercase text-[#B8863B]`}
-                        >
+                        <span className="text-xs font-semibold uppercase text-amber-800">
                           {request.requestType}
                         </span>
-
-                        <span
-                          className={`${mono} text-[10px] text-[#4A5568]`}
-                        >
+                        <span className="text-xs text-stone-500">
                           • Processed Date:{" "}
-                          {formatDate(
-                            request.updatedAt ||
-                              request.createdAt
-                          )}
+                          {formatDate(request.updatedAt || request.createdAt)}
                         </span>
                       </div>
                     </div>
@@ -308,10 +267,10 @@ const AgentHistoryRequests = () => {
                   <div className="flex items-center justify-between gap-3 sm:justify-end">
                     {/* Status */}
                     <span
-                      className={`${mono} border px-3 py-1 text-[10px] font-semibold uppercase tracking-wider ${
+                      className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${
                         isApproved
-                          ? "border-[#2D6A4F] bg-[#E8F5E9] text-[#2D6A4F]"
-                          : "border-[#B8452E] bg-[#FFEBEE] text-[#B8452E]"
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          : "bg-rose-50 text-rose-600 border border-rose-200"
                       }`}
                     >
                       {request.status}
@@ -320,8 +279,8 @@ const AgentHistoryRequests = () => {
                     {/* Chat */}
                     {customerId && (
                       <Link
-                        to={`/agent/chat/${customerId}`}
-                        className={`${mono} inline-flex items-center gap-2 border border-[#14213D] bg-[#14213D] px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#F7F5EF] transition hover:border-[#B8863B] hover:bg-[#B8863B]`}
+                        to={`/chat/${customerId}`}
+                        className="inline-flex items-center gap-2 rounded-xl bg-stone-900 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white no-underline transition hover:bg-amber-800"
                       >
                         <span>💬</span>
                         Chat

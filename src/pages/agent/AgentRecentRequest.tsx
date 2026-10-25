@@ -2,16 +2,11 @@ import { Link } from "react-router-dom";
 import { usegetPendingpurchaseRequests } from "../../hooks/usepurchase-requests";
 import { usegetrentalrequestsformyproperties } from "../../hooks/userental-requests";
 
-const serif = "[font-family:'Fraunces',serif]";
-const mono = "[font-family:'IBM_Plex_Mono',monospace]";
-
 const AgentRecentRequests = () => {
   const { data: pendingRequest, isLoading: purchaseLoading, isError: purchaseError } = usegetPendingpurchaseRequests();
   const { data: rentalRequest, isLoading: rentalLoading, isError: rentalError } = usegetrentalrequestsformyproperties();
 
-  // =========================
   // Safe Data Extraction & Normalization
-  // =========================
   const pendingPurchases: any[] = (pendingRequest?.data ?? []).map((item: any) => ({
     ...item,
     requestType: "Purchase request",
@@ -36,9 +31,7 @@ const AgentRecentRequests = () => {
   const isLoading = purchaseLoading || rentalLoading;
   const isError = purchaseError || rentalError;
 
-  // =========================
   // Helpers
-  // =========================
   const formatDate = (date: string) => {
     if (!date) return "";
 
@@ -58,85 +51,73 @@ const AgentRecentRequests = () => {
   };
 
   return (
-    <section className="border border-[#14213D] bg-[#FFFDF9]">
-      {/* =========================
-          Header
-      ========================= */}
-      <div className="flex items-center justify-between border-b border-[#14213D] bg-[#F7F5EF] p-5 sm:p-6">
+    <section className="rounded-2xl border border-stone-100 bg-white shadow-sm overflow-hidden text-stone-900">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-stone-100 bg-stone-50/50 p-5 sm:p-6">
         <div>
-          <span className={`${mono} text-[10px] uppercase tracking-[0.2em] text-[#B8863B]`}>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-800">
             Overview
           </span>
-          <h2 className={`${serif} text-lg font-bold text-[#14213D]`}>
+          <h2 className="text-lg font-bold tracking-tight text-stone-900">
             Recent Requests
           </h2>
-          <p className={`${mono} mt-0.5 text-xs text-[#4A5568]`}>
+          <p className="mt-0.5 text-xs text-stone-500">
             Latest customer requests
           </p>
         </div>
 
-        <span className={`${mono} border border-[#B8863B] bg-[#FFFDF9] px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#B8863B]`}>
+        <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-800">
           {isLoading
             ? "..."
             : `${totalCount} Pending`}
         </span>
       </div>
 
-      {/* =========================
-          Content
-      ========================= */}
-      <div className="divide-y divide-[#E4DFD3]">
-        {/* =========================
-            Loading
-        ========================= */}
+      {/* Content */}
+      <div className="divide-y divide-stone-100">
+        {/* Loading */}
         {isLoading && (
           <div className="p-8 text-center">
-            <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-[#E4DFD3] border-t-[#14213D]" />
-            <p className={`${mono} mt-3 text-xs uppercase tracking-widest text-[#4A5568]`}>
+            <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-stone-200 border-t-amber-800" />
+            <p className="mt-3 text-xs uppercase tracking-wider text-stone-500">
               Loading requests...
             </p>
           </div>
         )}
 
-        {/* =========================
-            Error
-        ========================= */}
+        {/* Error */}
         {isError && (
-          <div className="bg-[#FFFDF9] p-8 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center border border-[#B8452E] text-xl text-[#B8452E]">
+          <div className="bg-white p-8 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-rose-200 text-xl text-rose-600">
               ⚠️
             </div>
-            <h3 className={`${serif} mt-3 font-semibold text-[#B8452E]`}>
+            <h3 className="mt-3 font-semibold text-rose-600">
               Failed to load requests
             </h3>
-            <p className={`${mono} mt-1 text-xs text-[#4A5568]`}>
+            <p className="mt-1 text-xs text-stone-500">
               Something went wrong while loading requests.
             </p>
           </div>
         )}
 
-        {/* =========================
-            Empty
-        ========================= */}
+        {/* Empty */}
         {!isLoading &&
           !isError &&
           recentRequests.length === 0 && (
             <div className="p-8 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center border border-[#14213D] text-xl">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-stone-200 bg-stone-50 text-xl">
                 📋
               </div>
-              <h3 className={`${serif} mt-3 font-semibold text-[#14213D]`}>
+              <h3 className="mt-3 font-semibold text-stone-900">
                 No pending requests
               </h3>
-              <p className={`${mono} mt-1 text-xs text-[#4A5568]`}>
+              <p className="mt-1 text-xs text-stone-500">
                 Customer requests for your properties will appear here.
               </p>
             </div>
           )}
 
-        {/* =========================
-            Requests List
-        ========================= */}
+        {/* Requests List */}
         {!isLoading &&
           !isError &&
           recentRequests.map((request: any) => {
@@ -149,20 +130,20 @@ const AgentRecentRequests = () => {
             return (
               <div
                 key={`${request.typeKey}-${request.id}`}
-                className="p-5 transition hover:bg-[#F7F5EF]"
+                className="p-5 transition hover:bg-stone-50"
               >
                 <div className="flex items-start gap-3">
                   {/* Customer Avatar */}
                   {customerId ? (
                     <Link
                       to={`/agent/customer-profile/${customerId}`}
-                      className={`${mono} flex h-10 w-10 shrink-0 items-center justify-center border border-[#14213D] bg-[#14213D] font-bold text-[#F7F5EF] transition hover:border-[#B8863B] hover:bg-[#B8863B]`}
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-900 font-bold text-white no-underline transition hover:bg-amber-800"
                       title="View Customer Profile"
                     >
                       {customerName.charAt(0).toUpperCase()}
                     </Link>
                   ) : (
-                    <div className={`${mono} flex h-10 w-10 shrink-0 items-center justify-center border border-[#14213D] bg-[#14213D] font-bold text-[#F7F5EF]`}>
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-900 font-bold text-white">
                       {customerName.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -174,37 +155,37 @@ const AgentRecentRequests = () => {
                         {customerId ? (
                           <Link
                             to={`/agent/customer-profile/${customerId}`}
-                            className={`${serif} block truncate font-semibold text-[#14213D] transition hover:text-[#B8863B]`}
+                            className="block truncate font-semibold text-stone-900 no-underline transition hover:text-amber-800"
                           >
                             {customerName}
                           </Link>
                         ) : (
-                          <p className={`${serif} truncate font-semibold text-[#14213D]`}>
+                          <p className="truncate font-semibold text-stone-900">
                             {customerName}
                           </p>
                         )}
-                        <p className={`${mono} mt-0.5 text-[11px] text-[#4A5568]`}>
+                        <p className="mt-0.5 text-[11px] text-stone-500">
                           {request.requestType}
                         </p>
                       </div>
 
-                      <span className={`${mono} shrink-0 border border-dashed border-[#B8863B] px-2 py-0.5 text-[9px] uppercase tracking-wider text-[#B8863B]`}>
+                      <span className="shrink-0 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-amber-800">
                         {status}
                       </span>
                     </div>
 
                     {/* Property Card */}
-                    <div className="mt-3 border border-[#E4DFD3] bg-[#F7F5EF]/60 p-3">
-                      <p className={`${mono} text-[9px] font-medium uppercase tracking-wider text-[#4A5568]`}>
+                    <div className="mt-3 rounded-xl border border-stone-200 bg-stone-50 p-3">
+                      <p className="text-[9px] font-semibold uppercase tracking-wider text-stone-400">
                         Property
                       </p>
-                      <p className={`${serif} mt-0.5 truncate text-sm font-semibold text-[#14213D]`}>
+                      <p className="mt-0.5 truncate text-sm font-bold text-stone-900">
                         {request.property?.title ||
                           request.propertyTitle ||
                           "Untitled Property"}
                       </p>
                       {request.property?.address && (
-                        <p className={`${mono} mt-1 truncate text-xs text-[#4A5568]`}>
+                        <p className="mt-1 truncate text-xs text-stone-500">
                           📍 {request.property.address}
                         </p>
                       )}
@@ -212,7 +193,7 @@ const AgentRecentRequests = () => {
 
                     {/* Date */}
                     {request.createdAt && (
-                      <p className={`${mono} mt-2 text-[10px] text-[#4A5568]`}>
+                      <p className="mt-2 text-[10px] text-stone-400">
                         {formatDate(request.createdAt)}
                       </p>
                     )}
@@ -223,13 +204,11 @@ const AgentRecentRequests = () => {
           })}
       </div>
 
-      {/* =========================
-          Footer
-      ========================= */}
-      <div className="border-t border-[#14213D] bg-[#F7F5EF] p-4">
+      {/* Footer */}
+      <div className="border-t border-stone-100 bg-stone-50/50 p-4">
         <Link
           to="/agent/requests"
-          className={`${mono} flex w-full items-center justify-center border border-[#14213D] bg-[#14213D] py-2.5 text-xs font-semibold uppercase tracking-wider text-[#F7F5EF] transition hover:border-[#B8863B] hover:bg-[#B8863B]`}
+          className="flex w-full items-center justify-center rounded-xl bg-stone-900 py-2.5 text-xs font-semibold uppercase tracking-wider text-white no-underline transition hover:bg-amber-800"
         >
           View All Requests →
         </Link>

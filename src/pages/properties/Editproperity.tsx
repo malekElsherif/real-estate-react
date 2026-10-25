@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { usegetbyid, useeditprop } from "../../hooks/useProp"; // اضبط المسار حسب مشروعك
+import { usegetbyid, useeditprop } from "../../hooks/useProp";
+import { Modal, primary, ghost } from "../ui";
 
 export interface PropertyForm {
   title: string;
@@ -19,88 +20,66 @@ interface EditPropertyProps {
   onClose?: () => void;
 }
 
+const fields = [
+  ["title", "Title", "text"],
+  ["description", "Description", "text"],
+  ["city", "City", "text"],
+  ["price", "Price (EGP)", "number"],
+  ["bedrooms", "Bedrooms", "number"],
+  ["bathrooms", "Bathrooms", "number"],
+  ["area", "Area (m²)", "number"],
+] as const;
+
 const Editproperity = ({ id: propId, open = true, onClose }: EditPropertyProps) => {
   const { id: paramId } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
-  // تحديد المعرف سواء تم تمريره كـ Prop أو تم قراءته من الـ URL
   const propertyId = propId ?? (paramId ? Number(paramId) : 0);
 
-  const { data: propertyData, isLoading, isError } = usegetbyid(propertyId);
-  const editPropMutation = useeditprop();
-
-  const [formData, setFormData] = useState<Partial<PropertyForm>>({});
+  const { data, isLoading, isError } = usegetbyid(propertyId);
+  const edit = useeditprop();
+  const [form, setForm] = useState<Partial<PropertyForm>>({});
 
   useEffect(() => {
-    if (propertyData) {
-      setFormData(propertyData);
-    }
-  }, [propertyData]);
-
-  const handleClose = () => {
-    if (onClose) {
-      onClose();
-    } else {
-      navigate(-1);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!propertyId) return;
-
-    editPropMutation.mutate(
-      {
-        id: propertyId,
-        data: formData,
-      },
-      {
-        onSuccess: () => {
-          handleClose();
-        },
-      }
-    );
-  };
+    if (data) setForm(data);
+  }, [data]);
 
   if (!open) return null;
 
-  const formContent = (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h1 className="text-2xl font-bold text-slate-800">Edit Property</h1>
+  const close = () => (onClose ? onClose() : navigate(-1));
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (propertyId) edit.mutate({ id: propertyId, data: form }, { onSuccess: close });
+  };
+
+  const content = (
+    <form onSubmit={submit} className="space-y-4">
+      <h1 className="text-xl font-semibold text-stone-900">Edit Property</h1>
 
       {isLoading ? (
-        <div className="p-6 text-center text-slate-500">Loading details...</div>
+        <p className="py-6 text-center text-stone-500">Loading…</p>
       ) : isError || !propertyId ? (
-        <div className="p-6 text-center text-red-600">Property not found!</div>
+        <p className="py-6 text-center text-rose-600">Property not found</p>
       ) : (
         <>
-          <div>
-            <label className="block text-sm font-medium text-slate-700">Title</label>
-            <input
-              type="text"
-              value={formData.title || ""}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="mt-1 w-full border border-slate-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            {fields.map(([key, label, type]) => (
+              <label key={key} className={`text-sm font-medium text-stone-600 ${key === "title" || key === "description" ? "sm:col-span-2" : ""}`}>
+                {label}
+                <input
+                  type={type}
+                  value={(form[key] as string | number | undefined) ?? ""}
+                  onChange={(e) => setForm({ ...form, [key]: type === "number" ? Number(e.target.value) : e.target.value })}
+                  className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2 text-stone-900 outline-none transition focus:border-amber-700 focus:ring-4 focus:ring-amber-100"
+                />
+              </label>
+            ))}
           </div>
 
-          <div className="flex justify-end gap-3 pt-4">
-            {onClose && (
-              <button
-                type="button"
-                onClick={handleClose}
-                className="px-4 py-2 border border-slate-300 text-slate-600 rounded hover:bg-slate-50"
-              >
-                Cancel
-              </button>
-            )}
-            <button
-              type="submit"
-              disabled={editPropMutation.isPending}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 font-medium"
-            >
-              {editPropMutation.isPending ? "Updating..." : "Save Changes"}
+          <div className="flex justify-end gap-2 pt-2">
+            {onClose && <button type="button" onClick={close} className={ghost}>Cancel</button>}
+            <button type="submit" disabled={edit.isPending} className={primary}>
+              {edit.isPending ? "Saving…" : "Save changes"}
             </button>
           </div>
         </>
@@ -108,19 +87,11 @@ const Editproperity = ({ id: propId, open = true, onClose }: EditPropertyProps) 
     </form>
   );
 
-  // إذا تم استخدامه كـ Modal/Dialog
-  if (onClose) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-        <div className="w-full max-w-2xl rounded-xl bg-white p-6 shadow-xl">
-          {formContent}
-        </div>
-      </div>
-    );
-  }
-
-  // إذا تم استخدامه كصفحة مستقلة
-  return <div className="max-w-2xl mx-auto p-6">{formContent}</div>;
+  return onClose ? (
+    <Modal open onClose={onClose} size="max-w-xl">{content}</Modal>
+  ) : (
+    <div className="mx-auto max-w-xl rounded-2xl border border-stone-100 bg-white p-6 shadow-sm">{content}</div>
+  );
 };
 
 export default Editproperity;
