@@ -1,62 +1,27 @@
-import {
-  useactiveuser,
-  usedeactiveuser,
-} from "../../hooks/useadmin";
 import { useQueryClient } from "@tanstack/react-query";
-import { btnDanger, btnPadSm, btnSuccess } from "./adminBrand";
+import { useactiveuser, usedeactiveuser } from "../../hooks/useadmin";
 
 type ActiveDeactiveUserProps = {
   id: number;
   isActive: boolean;
 };
 
-const ActiveDeactiveUser = ({
-  id,
-  isActive,
-}: ActiveDeactiveUserProps) => {
-  const queryclient = useQueryClient();
-
-  const {
-    mutate: activemutate,
-    isPending: activeisPending,
-    isError: activeisError,
-  } = useactiveuser(id);
-
-  const {
-    mutate: deactivemutate,
-    isPending: deactiveisPending,
-    isError: deactiveisError,
-  } = usedeactiveuser(id);
+const ActiveDeactiveUser = ({ id, isActive }: ActiveDeactiveUserProps) => {
+  const queryClient = useQueryClient();
+  const { mutate: activate, isPending: isActivating, isError: activeisError } = useactiveuser(id);
+  const { mutate: deactivate, isPending: isDeactivating, isError: deactiveisError } = usedeactiveuser(id);
 
   const handleClick = () => {
-    if (isActive) {
-      deactivemutate(undefined, {
-        onSuccess: () => {
-          queryclient.invalidateQueries({
-            queryKey: ["getallusers"],
-          });
-
-          queryclient.invalidateQueries({
-            queryKey: ["user", id],
-          });
-        },
-      });
-    } else {
-      activemutate(undefined, {
-        onSuccess: () => {
-          queryclient.invalidateQueries({
-            queryKey: ["getallusers"],
-          });
-
-          queryclient.invalidateQueries({
-            queryKey: ["user", id],
-          });
-        },
-      });
-    }
+    const action = isActive ? deactivate : activate;
+    action(undefined, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["getallusers"] });
+        queryClient.invalidateQueries({ queryKey: ["user", id] });
+      },
+    });
   };
 
-  const isPending = activeisPending || deactiveisPending;
+  const isPending = isActivating || isDeactivating;
 
   return (
     <div>
@@ -64,27 +29,21 @@ const ActiveDeactiveUser = ({
         type="button"
         onClick={handleClick}
         disabled={isPending}
-        className={`${btnPadSm} ${isActive ? btnDanger : btnSuccess}`}
+        className={`rounded-xl border px-3 py-2 text-[10px] font-semibold transition disabled:opacity-50 ${
+          isActive
+            ? "border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
+            : "border-green-600 bg-green-600 text-white hover:bg-green-700"
+        }`}
       >
-        {isPending
-          ? isActive
-            ? "Deactivating..."
-            : "Activating..."
-          : isActive
-          ? "Deactivate"
-          : "Activate"}
+        {isPending ? (isActive ? "Deactivating..." : "Activating...") : (isActive ? "Deactivate" : "Activate")}
       </button>
 
       {activeisError && !isActive && (
-        <p className="font-data mt-1 text-[10px] text-[#B8452E]">
-          Failed to activate user
-        </p>
+        <p className="mt-1 text-[10px] text-red-600 font-mono">Failed to activate user</p>
       )}
 
       {deactiveisError && isActive && (
-        <p className="font-data mt-1 text-[10px] text-[#B8452E]">
-          Failed to deactivate user
-        </p>
+        <p className="mt-1 text-[10px] text-red-600 font-mono">Failed to deactivate user</p>
       )}
     </div>
   );

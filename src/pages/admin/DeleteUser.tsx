@@ -1,11 +1,3 @@
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-} from "@mui/material";
 import { usedeleteuser } from "../../hooks/useadmin";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -15,104 +7,62 @@ type DeleteUserProps = {
   onClose: () => void;
 };
 
-const mono = "'IBM Plex Mono', ui-monospace, monospace";
-const serif = "'Fraunces', Georgia, serif";
-
 const DeleteUser = ({ id, open, onClose }: DeleteUserProps) => {
   const { mutate, isPending } = usedeleteuser(id);
-  const queryclient = useQueryClient();
+  const queryClient = useQueryClient();
+
+  if (!open) return null;
 
   const handleDelete = () => {
     mutate(undefined, {
       onSuccess: () => {
-        queryclient.invalidateQueries({
+        queryClient.invalidateQueries({
           queryKey: ["getallusers"],
         });
-
         onClose();
       },
     });
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      slotProps={{
-        paper: {
-          sx: {
-            borderRadius: 0,
-            border: "1px solid #14213D",
-            bgcolor: "#FFFDF9",
-            boxShadow: "none",
-            minWidth: { sm: 420 },
-          },
-        },
-      }}
-    >
-      <DialogTitle
-        sx={{
-          fontFamily: serif,
-          fontWeight: 600,
-          fontSize: "1.5rem",
-          color: "#14213D",
-          borderBottom: "1px solid #E4DFD3",
-        }}
-      >
-        Delete User
-      </DialogTitle>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-white shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
 
-      <DialogContent sx={{ pt: "24px !important" }}>
-        <Typography
-          sx={{
-            fontFamily: mono,
-            fontSize: "0.8rem",
-            lineHeight: 1.7,
-            color: "#14213D",
-          }}
-        >
-          Are you sure you want to delete this user? This action cannot be
-          undone.
-        </Typography>
-      </DialogContent>
+        {/* Header */}
+        <div className="border-b border-stone-200 px-6 py-4 bg-stone-50">
+          <h3 className="text-lg font-bold text-stone-900">Delete User</h3>
+        </div>
 
-      <DialogActions sx={{ p: 2, borderTop: "1px solid #E4DFD3", gap: 1 }}>
-        <Button
-          onClick={onClose}
-          disabled={isPending}
-          sx={{
-            borderRadius: 0,
-            border: "1px solid #14213D",
-            color: "#14213D",
-            fontFamily: mono,
-            fontSize: "0.7rem",
-            letterSpacing: "0.14em",
-            px: 2.5,
-            "&:hover": { bgcolor: "#14213D", color: "#FFFDF9" },
-          }}
-        >
-          Cancel
-        </Button>
+        {/* Content */}
+        <div className="px-6 py-6">
+          <p className="text-xs text-stone-600 leading-relaxed font-mono">
+            Are you sure you want to delete this user? This action cannot be undone.
+          </p>
+        </div>
 
-        <Button
-          onClick={handleDelete}
-          variant="contained"
-          disabled={isPending}
-          disableElevation
-          sx={{
-            borderRadius: 0,
-            bgcolor: "#B8452E",
-            fontFamily: mono,
-            fontSize: "0.7rem",
-            letterSpacing: "0.14em",
-            px: 2.5,
-            "&:hover": { bgcolor: "#9c3a26" },
-          }}
-        >
-          {isPending ? "Deleting..." : "Delete"}
-        </Button>
-      </DialogActions>
-    </Dialog>
+        {/* Actions */}
+        <div className="flex items-center justify-end gap-2 border-t border-stone-200 bg-stone-50 px-6 py-4">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isPending}
+            className="rounded-xl border border-stone-300 bg-white px-4 py-2 text-xs font-semibold text-stone-700 hover:border-stone-900 transition disabled:opacity-50"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={isPending}
+            className="rounded-xl bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700 transition disabled:opacity-50"
+          >
+            {isPending ? "Deleting..." : "Delete"}
+          </button>
+        </div>
+
+      </div>
+    </div>
   );
 };
 

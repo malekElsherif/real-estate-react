@@ -1,18 +1,3 @@
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  IconButton,
-  Typography,
-  CircularProgress,
-  Box,
-  Card,
-  CardContent,
-} from "@mui/material";
-
-import CloseIcon from "@mui/icons-material/Close";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-
 import { usegetmyfav } from "../../hooks/usefav";
 
 type MyfavProps = {
@@ -20,240 +5,85 @@ type MyfavProps = {
   onClose: () => void;
 };
 
-const mono = "'IBM Plex Mono', ui-monospace, monospace";
-const serif = "'Fraunces', Georgia, serif";
-
 const Myfav = ({ open, onClose }: MyfavProps) => {
-  const {
-    data,
-    isPending: isLoading,
-    isError,
-  } = usegetmyfav();
-
-  // data is AxiosResponse, so the actual array is inside data.data
+  const { data, isPending: isLoading, isError } = usegetmyfav();
   const favorites = data?.data ?? [];
 
+  if (!open) return null;
+
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      fullWidth
-      maxWidth="md"
-      slotProps={{ paper: { sx: {
-          borderRadius: 0,
-          border: "1px solid #14213D",
-          bgcolor: "#FFFDF9",
-          boxShadow: "none",
-        } } }}
-    >
-      {/* Header */}
-      <DialogTitle
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          bgcolor: "#14213D",
-          color: "#FFFDF9",
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          <FavoriteIcon sx={{ color: "#B8863B" }} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-3xl rounded-2xl border border-stone-200 bg-white shadow-xl overflow-hidden flex flex-col max-h-[85vh]">
 
-          <Typography
-            sx={{
-              fontFamily: serif,
-              fontWeight: 600,
-              fontSize: "1.5rem",
-            }}
+        {/* Header */}
+        <div className="flex items-center justify-between bg-stone-900 px-6 py-4 text-stone-50">
+          <div className="flex items-center gap-2">
+            <span className="text-amber-500 text-lg">♡</span>
+            <h3 className="text-lg font-bold">My Favorites</h3>
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="close"
+            className="text-stone-400 hover:text-amber-500 transition text-sm font-bold p-1"
           >
-            My Favorites
-          </Typography>
-        </Box>
+            ✕
+          </button>
+        </div>
 
-        <IconButton
-          onClick={onClose}
-          aria-label="close"
-          sx={{ color: "#FFFDF9", "&:hover": { color: "#B8863B" } }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6 bg-stone-50 min-h-[300px]">
+          {isLoading && (
+            <div className="flex min-h-[250px] items-center justify-center">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-stone-300 border-t-amber-800" />
+            </div>
+          )}
 
-      {/* Content */}
-      <DialogContent
-        sx={{
-          minHeight: 300,
-          bgcolor: "#FFFDF9",
-          p: 3,
-        }}
-      >
-        {/* Loading */}
-        {isLoading && (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              minHeight: 250,
-            }}
-          >
-            <CircularProgress sx={{ color: "#B8863B" }} />
-          </Box>
-        )}
+          {isError && (
+            <div className="flex min-h-[250px] items-center justify-center">
+              <p className="text-xs font-mono text-red-600">Failed to load your favorites.</p>
+            </div>
+          )}
 
-        {/* Error */}
-        {isError && (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              minHeight: 250,
-            }}
-          >
-            <Typography
-              sx={{
-                fontFamily: mono,
-                fontSize: "0.8rem",
-                color: "#B8452E",
-              }}
-            >
-              Failed to load your favorites.
-            </Typography>
-          </Box>
-        )}
+          {!isLoading && !isError && favorites.length === 0 && (
+            <div className="flex min-h-[250px] flex-col items-center justify-center text-center">
+              <span className="text-4xl text-stone-300 mb-2">♡</span>
+              <h4 className="text-xl font-bold text-stone-900">No favorites yet</h4>
+              <p className="mt-1 text-xs text-stone-500 font-mono">
+                Properties you add to favorites will appear here.
+              </p>
+            </div>
+          )}
 
-        {/* Empty */}
-        {!isLoading && !isError && favorites.length === 0 && (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              minHeight: 250,
-              textAlign: "center",
-            }}
-          >
-            <FavoriteIcon
-              sx={{ fontSize: 56, color: "#E4DFD3", mb: 2 }}
-            />
+          {!isLoading && !isError && favorites.length > 0 && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {favorites.map((favorite: any) => {
+                const property = favorite.property ?? favorite;
 
-            <Typography
-              sx={{
-                fontFamily: serif,
-                fontWeight: 600,
-                fontSize: "1.5rem",
-                color: "#14213D",
-              }}
-            >
-              No favorites yet
-            </Typography>
+                return (
+                  <div
+                    key={favorite.id ?? property.id}
+                    className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-amber-600 hover:shadow-md flex flex-col justify-between"
+                  >
+                    <div>
+                      <h4 className="font-semibold text-stone-900 line-clamp-1 text-base">{property.title}</h4>
+                      <p className="mt-1 text-xs text-stone-500 font-mono">{property.address}</p>
+                    </div>
 
-            <Typography
-              sx={{
-                fontFamily: mono,
-                fontSize: "0.75rem",
-                color: "#4A5568",
-                mt: 1,
-              }}
-            >
-              Properties you add to favorites will appear here.
-            </Typography>
-          </Box>
-        )}
-
-        {/* Favorites */}
-        {!isLoading && !isError && favorites.length > 0 && (
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr",
-                sm: "repeat(2, 1fr)",
-              },
-              gap: 2,
-            }}
-          >
-            {favorites.map((favorite: any) => {
-              const property = favorite.property ?? favorite;
-
-              return (
-                <Card
-                  key={favorite.id ?? property.id}
-                  elevation={0}
-                  sx={{
-                    borderRadius: 0,
-                    border: "1px solid #E4DFD3",
-                    bgcolor: "#FFFFFF",
-                    transition: "all 0.2s ease",
-                    "&:hover": {
-                      transform: "translateY(-3px)",
-                      borderColor: "#B8863B",
-                      boxShadow: "0 12px 30px -12px rgba(20,33,61,0.25)",
-                    },
-                  }}
-                >
-                  <CardContent>
-                    {/* Title */}
-                    <Typography
-                      noWrap
-                      sx={{
-                        fontFamily: serif,
-                        fontWeight: 600,
-                        fontSize: "1.2rem",
-                        color: "#14213D",
-                      }}
-                    >
-                      {property.title}
-                    </Typography>
-
-                    {/* Address */}
-                    <Typography
-                      sx={{
-                        fontFamily: mono,
-                        fontSize: "0.72rem",
-                        color: "#4A5568",
-                        mt: 1,
-                      }}
-                    >
-                      {property.address}
-                    </Typography>
-
-                    {/* Bottom */}
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        mt: 2,
-                        pt: 2,
-                        borderTop: "1px solid #E4DFD3",
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          fontFamily: mono,
-                          fontWeight: 600,
-                          fontSize: "0.85rem",
-                          color: "#B8863B",
-                        }}
-                      >
+                    <div className="mt-4 flex items-center justify-between border-t border-stone-100 pt-4">
+                      <span className="font-semibold text-amber-800 text-sm font-mono">
                         {property.price} EGP
-                      </Typography>
+                      </span>
+                      <span className="text-amber-600 text-lg">♡</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
-                      <FavoriteIcon
-                        sx={{ color: "#B8863B", fontSize: 20 }}
-                      />
-                    </Box>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </Box>
-        )}
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 

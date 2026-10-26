@@ -1,11 +1,10 @@
-import { Button } from "@mui/material";
 import { useQueryClient, type QueryKey } from "@tanstack/react-query";
 import { useAvailablityprop } from "../../hooks/useProp";
 
 type AvailabilityPropProps = {
   id: number;
   status: string;
-  queryKey?: QueryKey; // دعم كائن أو مصفوفة مفاتيح كاش بدلاً من String مجرد
+  queryKey?: QueryKey;
 };
 
 const AvailabilityProp = ({
@@ -14,7 +13,6 @@ const AvailabilityProp = ({
   queryKey,
 }: AvailabilityPropProps) => {
   const queryClient = useQueryClient();
-
   const { mutate: changeAvailability, isPending } = useAvailablityprop();
 
   const handleAvailability = () => {
@@ -30,46 +28,25 @@ const AvailabilityProp = ({
   };
 
   const isAvailable = status === "AVAILABLE";
-
-  const isDisabled =
-    isPending ||
-    (status !== "AVAILABLE" && status !== "PENDING");
-
-  // Available -> gold (take down) | Not available -> green (publish)
-  const base = isAvailable ? "#B8863B" : "#5B7B65";
-  const hover = isAvailable ? "#a37632" : "#4a6652";
+  const isDisabled = isPending || (status !== "AVAILABLE" && status !== "PENDING");
 
   return (
-    <Button
-      variant="contained"
+    <button
+      type="button"
       onClick={handleAvailability}
       disabled={isDisabled}
-      disableElevation
-      sx={{
-        borderRadius: 0,
-        textTransform: "uppercase",
-        fontFamily: "'IBM Plex Mono', ui-monospace, monospace",
-        fontWeight: 600,
-        fontSize: "0.65rem",
-        letterSpacing: "0.14em",
-        boxShadow: "none",
-        minWidth: 145,
-        bgcolor: base,
-        color: "#FFFDF9",
-        "&:hover": { bgcolor: hover, boxShadow: "none" },
-        "&.Mui-disabled": {
-          bgcolor: base,
-          color: "#FFFDF9",
-          opacity: 0.5,
-        },
-      }}
+      className={`rounded-xl px-4 py-2 text-[10px] font-semibold uppercase tracking-wider transition disabled:cursor-not-allowed disabled:opacity-50 ${
+        isAvailable
+          ? "bg-amber-800 text-white hover:bg-amber-900"
+          : "bg-green-700 text-white hover:bg-green-800"
+      }`}
     >
       {isPending
         ? "Updating..."
         : isAvailable
-          ? "Make Unavailable"
-          : "Make Available"}
-    </Button>
+        ? "Make Unavailable"
+        : "Make Available"}
+    </button>
   );
 };
 

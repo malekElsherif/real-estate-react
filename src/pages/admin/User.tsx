@@ -11,8 +11,6 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import {
   activePill,
-  btnDark,
-  btnPad,
   inactivePill,
   roleAvatarClass,
   roleBadgeClass,
@@ -47,11 +45,10 @@ const UserAdmin = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center bg-[#FFFDF9]">
+      <div className="flex min-h-[500px] items-center justify-center bg-stone-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#14213D]/15 border-t-[#B8863B]" />
-
-          <p className="eyebrow text-[#14213D]/70">Loading user</p>
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-stone-300 border-t-amber-800" />
+          <p className="text-xs uppercase tracking-widest text-stone-500 font-medium">Loading user</p>
         </div>
       </div>
     );
@@ -59,23 +56,15 @@ const UserAdmin = () => {
 
   if (isError) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center bg-[#FFFDF9] px-4">
-        <div className="w-full max-w-md border border-[#14213D]/15 bg-white p-8 text-center">
-          <div className="mx-auto h-px w-10 bg-[#B8863B]" />
-
-          <h2 className="font-heading mt-5 text-2xl font-semibold text-[#14213D]">
-            Failed to load user
-          </h2>
-
-          <p className="mt-2 text-xs leading-relaxed text-[#14213D]/60">
-            {error instanceof Error
-              ? error.message
-              : "Failed to fetch user information."}
+      <div className="flex min-h-[500px] items-center justify-center bg-stone-50 px-4">
+        <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-white p-8 text-center shadow-sm">
+          <h2 className="text-xl font-bold text-stone-900">Failed to load user</h2>
+          <p className="mt-2 text-xs text-stone-500 leading-relaxed">
+            {error instanceof Error ? error.message : "Failed to fetch user information."}
           </p>
-
           <button
             onClick={() => navigate("/admin/dashboard/users/manage")}
-            className={`mt-6 ${btnPad} ${btnDark}`}
+            className="mt-6 w-full rounded-xl bg-stone-900 py-2.5 text-xs font-semibold text-stone-50 hover:bg-amber-800 transition"
           >
             Back to Users
           </button>
@@ -88,15 +77,12 @@ const UserAdmin = () => {
 
   if (!user) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center bg-[#FFFDF9]">
+      <div className="flex min-h-[500px] items-center justify-center bg-stone-50">
         <div className="text-center">
-          <p className="font-heading text-2xl font-semibold text-[#14213D]">
-            User not found
-          </p>
-
+          <h2 className="text-xl font-bold text-stone-900">User not found</h2>
           <button
             onClick={() => navigate("/admin/dashboard/users/manage")}
-            className={`mt-4 ${btnPad} ${btnDark}`}
+            className="mt-4 rounded-xl bg-stone-900 px-4 py-2.5 text-xs font-semibold text-stone-50 hover:bg-amber-800 transition"
           >
             Back to Users
           </button>
@@ -107,20 +93,13 @@ const UserAdmin = () => {
 
   const isAdmin = user.role === "ADMIN";
   const isAgent = user.role === "AGENT";
-
-  const initials =
-    user.name?.trim()?.charAt(0)?.toUpperCase() || "U";
+  const initials = user.name?.trim()?.charAt(0)?.toUpperCase() || "U";
 
   const handleVerifyAgent = () => {
     verifyAgent(undefined, {
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["getuserbyid", userId],
-        });
-
-        queryClient.invalidateQueries({
-          queryKey: ["getallusers"],
-        });
+        queryClient.invalidateQueries({ queryKey: ["getuserbyid", userId] });
+        queryClient.invalidateQueries({ queryKey: ["getallusers"] });
       },
     });
   };
@@ -128,13 +107,8 @@ const UserAdmin = () => {
   const handleRejectAgent = () => {
     rejectAgent(undefined, {
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["getuserbyid", userId],
-        });
-
-        queryClient.invalidateQueries({
-          queryKey: ["getallusers"],
-        });
+        queryClient.invalidateQueries({ queryKey: ["getuserbyid", userId] });
+        queryClient.invalidateQueries({ queryKey: ["getallusers"] });
       },
     });
   };
@@ -146,30 +120,28 @@ const UserAdmin = () => {
     { label: "User ID", value: `#${user.id}` },
   ];
 
-  // Shared look for the admin action tiles
   const tileBase =
-    "group flex items-center justify-between border bg-white p-5 text-left transition hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-12px_rgba(20,33,61,0.25)] disabled:cursor-not-allowed disabled:opacity-60";
+    "group flex items-center justify-between rounded-2xl border border-stone-200 bg-white p-5 text-left transition hover:-translate-y-0.5 hover:border-amber-600 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60";
 
   const tileIcon =
-    "font-heading flex h-11 w-11 items-center justify-center border text-lg";
+    "flex h-11 w-11 items-center justify-center rounded-xl border text-base font-bold";
 
   return (
-    <div className="min-h-screen bg-[#FFFDF9] pb-16 text-[#14213D]">
+    <div className="min-h-screen bg-stone-50 pb-16 text-stone-900">
       {/* Header */}
-      <header className="bg-[#14213D]">
+      <header className="bg-stone-900 text-stone-50">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
           <button
             onClick={() => navigate("/admin/dashboard/users/manage")}
-            className="eyebrow mb-6 inline-flex items-center gap-2 text-[#FFFDF9]/60 transition hover:text-[#B8863B]"
+            className="mb-6 inline-flex items-center gap-2 text-xs uppercase tracking-wider text-stone-400 hover:text-amber-500 transition font-semibold"
           >
             ← Back to Users
           </button>
 
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-5">
-              {/* Avatar */}
               <div
-                className={`font-heading flex h-16 w-16 shrink-0 items-center justify-center border border-[#B8863B] text-3xl font-semibold ${roleAvatarClass(
+                className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-amber-600 text-3xl font-bold ${roleAvatarClass(
                   user.role
                 )}`}
               >
@@ -178,14 +150,14 @@ const UserAdmin = () => {
 
               <div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <h1 className="font-heading text-3xl font-semibold text-[#FFFDF9]">
+                  <h1 className="text-3xl font-bold text-stone-50">
                     {user.name || "Unknown User"}
                   </h1>
 
                   <span
-                    className={`eyebrow border px-2.5 py-1 font-semibold ${
+                    className={`rounded-lg border px-2.5 py-1 text-[10px] font-semibold uppercase ${
                       isAdmin
-                        ? "border-[#FFFDF9]/40 text-[#FFFDF9]"
+                        ? "border-stone-700 bg-stone-800 text-stone-50"
                         : roleBadgeClass(user.role)
                     }`}
                   >
@@ -193,60 +165,46 @@ const UserAdmin = () => {
                   </span>
                 </div>
 
-                <p className="eyebrow mt-2 text-[#FFFDF9]/50">
+                <p className="mt-2 text-[10px] uppercase tracking-wider text-stone-400 font-mono">
                   User ID #{user.id}
                 </p>
               </div>
             </div>
 
-            {/* Status */}
             <div>
               {user.isActive ? (
                 <span className={activePill}>
-                  <span className="h-2 w-2 rounded-full bg-[#5B7B65]" />
+                  <span className="h-2 w-2 rounded-full bg-green-600" />
                   Active Account
                 </span>
               ) : (
                 <span className={inactivePill}>
-                  <span className="h-2 w-2 rounded-full bg-[#B8452E]" />
+                  <span className="h-2 w-2 rounded-full bg-red-600" />
                   Inactive Account
                 </span>
               )}
             </div>
           </div>
         </div>
-
-        <div className="h-px bg-gradient-to-r from-transparent via-[#B8863B] to-transparent" />
       </header>
 
       {/* Main */}
       <main className="mx-auto max-w-6xl px-4 pt-10 sm:px-6 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-3">
           {/* User Information */}
-          <section className="border border-[#14213D]/15 bg-white p-7 lg:col-span-2">
-            <div className="border-b border-[#E4DFD3] pb-5">
-              <h2 className="font-heading text-2xl font-semibold">
-                User Information
-              </h2>
-
-              <p className="eyebrow mt-1 text-[#14213D]/45">
+          <section className="rounded-2xl border border-stone-200 bg-white p-7 shadow-sm lg:col-span-2">
+            <div className="border-b border-stone-200 pb-5">
+              <h2 className="text-xl font-bold text-stone-900">User Information</h2>
+              <p className="mt-1 text-[10px] uppercase tracking-wider text-stone-500 font-semibold">
                 Account details and current status
               </p>
             </div>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {infoFields.map((field) => (
-                <div
-                  key={field.label}
-                  className="border border-[#E4DFD3] bg-[#FFFDF9] p-5"
-                >
-                  <p className="eyebrow text-[#14213D]/50">{field.label}</p>
-
-                  <p
-                    className={`mt-2 text-sm font-semibold text-[#14213D] ${
-                      field.breakAll ? "break-all" : ""
-                    }`}
-                  >
+                <div key={field.label} className="rounded-xl border border-stone-200 bg-stone-50 p-5">
+                  <p className="text-[10px] uppercase tracking-wider text-stone-500 font-semibold">{field.label}</p>
+                  <p className={`mt-2 text-sm font-bold text-stone-900 ${field.breakAll ? "break-all" : ""}`}>
                     {field.value}
                   </p>
                 </div>
@@ -255,38 +213,31 @@ const UserAdmin = () => {
           </section>
 
           {/* Account Status */}
-          <section className="border border-[#14213D]/15 bg-white p-7">
-            <h2 className="font-heading text-2xl font-semibold">
-              Account Status
-            </h2>
-
-            <p className="eyebrow mt-1 text-[#14213D]/45">
+          <section className="rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
+            <h2 className="text-xl font-bold text-stone-900">Account Status</h2>
+            <p className="mt-1 text-[10px] uppercase tracking-wider text-stone-500 font-semibold">
               Current account state
             </p>
 
             <div
-              className={`mt-6 border p-5 ${
+              className={`mt-6 rounded-xl border p-5 ${
                 user.isActive
-                  ? "border-[#5B7B65]/50 bg-[#5B7B65]/10"
-                  : "border-[#B8452E]/50 bg-[#B8452E]/10"
+                  ? "border-green-600/40 bg-green-50/50"
+                  : "border-red-600/40 bg-red-50/50"
               }`}
             >
               <div className="flex items-center gap-3">
                 <span
                   className={`h-3 w-3 shrink-0 rounded-full ${
-                    user.isActive ? "bg-[#5B7B65]" : "bg-[#B8452E]"
+                    user.isActive ? "bg-green-600" : "bg-red-600"
                   }`}
                 />
-
                 <div>
-                  <p className="font-heading text-lg font-semibold">
+                  <p className="text-sm font-bold text-stone-900">
                     {user.isActive ? "Active" : "Inactive"}
                   </p>
-
-                  <p className="text-xs text-[#4A5568]">
-                    {user.isActive
-                      ? "User can access the platform."
-                      : "User access is currently disabled."}
+                  <p className="text-xs text-stone-600 mt-0.5">
+                    {user.isActive ? "User can access the platform." : "User access is currently disabled."}
                   </p>
                 </div>
               </div>
@@ -294,80 +245,59 @@ const UserAdmin = () => {
 
             {!isAdmin && (
               <div className="mt-5">
-                <ActiveDeactiveUser
-                  id={user.id}
-                  isActive={user.isActive}
-                />
+                <ActiveDeactiveUser id={user.id} isActive={user.isActive} />
               </div>
             )}
           </section>
 
           {/* Admin Actions */}
-          <section className="border border-[#14213D]/15 bg-white p-7 lg:col-span-3">
-            <div className="border-b border-[#E4DFD3] pb-5">
-              <h2 className="font-heading text-2xl font-semibold">
-                User Administration
-              </h2>
-
-              <p className="eyebrow mt-1 text-[#14213D]/45">
+          <section className="rounded-2xl border border-stone-200 bg-white p-7 shadow-sm lg:col-span-3">
+            <div className="border-b border-stone-200 pb-5">
+              <h2 className="text-xl font-bold text-stone-900">User Administration</h2>
+              <p className="mt-1 text-[10px] uppercase tracking-wider text-stone-500 font-semibold">
                 Manage account activity and administrative actions
               </p>
             </div>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {/* Verify / Reject Agent */}
               {isAgent && (
                 <>
                   <button
                     onClick={handleVerifyAgent}
                     disabled={isVerifyingAgent || isRejectingAgent}
-                    className={`${tileBase} border-[#5B7B65]/40 hover:border-[#5B7B65]`}
+                    className={`${tileBase} border-green-600/30 hover:border-green-600`}
                   >
                     <div className="flex items-center gap-4">
-                      <div
-                        className={`${tileIcon} border-[#5B7B65]/40 bg-[#5B7B65]/10 text-[#5B7B65]`}
-                      >
+                      <div className={`${tileIcon} border-green-600/30 bg-green-50 text-green-700`}>
                         {isVerifyingAgent ? "…" : "✓"}
                       </div>
-
                       <div>
-                        <p className="text-sm font-semibold text-[#5B7B65]">
+                        <p className="text-sm font-bold text-green-700">
                           {isVerifyingAgent ? "Verifying..." : "Verify Agent"}
                         </p>
-
-                        <p className="mt-1 text-[11px] text-[#4A5568]">
-                          Approve this agent account
-                        </p>
+                        <p className="mt-0.5 text-xs text-stone-500">Approve this agent account</p>
                       </div>
                     </div>
-
-                    <span className="text-[#5B7B65]">→</span>
+                    <span className="text-green-700">→</span>
                   </button>
 
                   <button
                     onClick={handleRejectAgent}
                     disabled={isVerifyingAgent || isRejectingAgent}
-                    className={`${tileBase} border-[#B8863B]/40 hover:border-[#B8863B]`}
+                    className={`${tileBase} border-amber-600/30 hover:border-amber-600`}
                   >
                     <div className="flex items-center gap-4">
-                      <div
-                        className={`${tileIcon} border-[#B8863B]/40 bg-[#B8863B]/10 text-[#B8863B]`}
-                      >
+                      <div className={`${tileIcon} border-amber-600/30 bg-amber-50 text-amber-700`}>
                         {isRejectingAgent ? "…" : "✕"}
                       </div>
-
                       <div>
-                        <p className="text-sm font-semibold text-[#B8863B]">
+                        <p className="text-sm font-bold text-amber-800">
                           {isRejectingAgent ? "Rejecting..." : "Reject Agent"}
                         </p>
-
-                        <p className="mt-1 text-[11px] text-[#4A5568]">
-                          Reject this agent account
-                        </p>
+                        <p className="mt-0.5 text-xs text-stone-500">Reject this agent account</p>
                       </div>
                     </div>
-
-                    <span className="text-[#B8863B]">→</span>
+                    <span className="text-amber-700">→</span>
                   </button>
                 </>
               )}
@@ -375,56 +305,36 @@ const UserAdmin = () => {
               {/* Activity */}
               <button
                 onClick={() => setActivityOpen(true)}
-                className={`${tileBase} border-[#14213D]/20 hover:border-[#B8863B]`}
+                className={tileBase}
               >
                 <div className="flex items-center gap-4">
-                  <div
-                    className={`${tileIcon} border-[#14213D]/20 bg-[#14213D] text-[#B8863B]`}
-                  >
+                  <div className={`${tileIcon} border-stone-300 bg-stone-100 text-stone-900`}>
                     ≡
                   </div>
-
                   <div>
-                    <p className="text-sm font-semibold text-[#14213D]">
-                      Activity Report
-                    </p>
-
-                    <p className="mt-1 text-[11px] text-[#4A5568]">
-                      Review user activity
-                    </p>
+                    <p className="text-sm font-bold text-stone-900">Activity Report</p>
+                    <p className="mt-0.5 text-xs text-stone-500">Review user activity</p>
                   </div>
                 </div>
-
-                <span className="text-[#14213D]/50 transition group-hover:text-[#B8863B]">
-                  →
-                </span>
+                <span className="text-stone-400 group-hover:text-amber-600 transition">→</span>
               </button>
 
               {/* Delete */}
               {!isAdmin && (
                 <button
                   onClick={() => setDeleteOpen(true)}
-                  className={`${tileBase} border-[#B8452E]/40 hover:border-[#B8452E]`}
+                  className={`${tileBase} border-red-600/30 hover:border-red-600`}
                 >
                   <div className="flex items-center gap-4">
-                    <div
-                      className={`${tileIcon} border-[#B8452E]/40 bg-[#B8452E]/10 text-[#B8452E]`}
-                    >
+                    <div className={`${tileIcon} border-red-600/30 bg-red-50 text-red-600`}>
                       ✕
                     </div>
-
                     <div>
-                      <p className="text-sm font-semibold text-[#B8452E]">
-                        Delete User
-                      </p>
-
-                      <p className="mt-1 text-[11px] text-[#4A5568]">
-                        Permanently remove account
-                      </p>
+                      <p className="text-sm font-bold text-red-600">Delete User</p>
+                      <p className="mt-0.5 text-xs text-stone-500">Permanently remove account</p>
                     </div>
                   </div>
-
-                  <span className="text-[#B8452E]">→</span>
+                  <span className="text-red-600">→</span>
                 </button>
               )}
             </div>
@@ -432,20 +342,15 @@ const UserAdmin = () => {
 
           {/* Admin Protection */}
           {isAdmin && (
-            <section className="border border-[#B8863B]/50 bg-[#B8863B]/10 p-6 lg:col-span-3">
+            <section className="rounded-2xl border border-amber-500/40 bg-amber-50/50 p-6 shadow-sm lg:col-span-3">
               <div className="flex items-start gap-4">
-                <div className="font-heading flex h-11 w-11 shrink-0 items-center justify-center border border-[#B8863B] text-lg text-[#B8863B]">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-amber-600 text-lg font-bold text-amber-700 bg-white">
                   !
                 </div>
-
                 <div>
-                  <h3 className="font-heading text-xl font-semibold">
-                    Administrator Account
-                  </h3>
-
-                  <p className="mt-1 text-xs leading-relaxed text-[#4A5568]">
-                    Administrative accounts cannot be deactivated or deleted
-                    from this interface.
+                  <h3 className="text-xl font-bold text-stone-900">Administrator Account</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-stone-600">
+                    Administrative accounts cannot be deactivated or deleted from this interface.
                   </p>
                 </div>
               </div>
@@ -456,20 +361,12 @@ const UserAdmin = () => {
 
       {/* Activity Dialog */}
       {activityOpen && (
-        <Useractivityreport
-          id={user.id}
-          open={true}
-          onClose={() => setActivityOpen(false)}
-        />
+        <Useractivityreport id={user.id} open onClose={() => setActivityOpen(false)} />
       )}
 
       {/* Delete Dialog */}
       {deleteOpen && (
-        <DeleteUser
-          id={user.id}
-          open={true}
-          onClose={() => setDeleteOpen(false)}
-        />
+        <DeleteUser id={user.id} open onClose={() => setDeleteOpen(false)} />
       )}
     </div>
   );
