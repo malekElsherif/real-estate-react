@@ -41,7 +41,7 @@ const AdminSidebar = () => {
   let counter = 0;
 
   return (
-    <aside className="flex h-full w-64 shrink-0 flex-col bg-stone-900 text-stone-300 font-sans border-r border-amber-600/30">
+    <aside className="flex h-full w-64 shrink-0 flex-col bg-stone-900 text-stone-300 font-sans">
       {/* Brand */}
       <div className="flex items-center gap-3 border-b border-stone-800 p-6">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-700 text-stone-900 font-bold text-lg">
