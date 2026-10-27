@@ -20,7 +20,7 @@ const Navbar = () => {
     ["/", "Home"],
     ["/properties", "Properties"],
     ["/about", "About"],
-    ["/contact", "Contact"],
+    // ["/contact", "Contact"],
     ...(user && role === "USER" ? [["/myrequests", "My Requests"]] : []),
   ];
 
