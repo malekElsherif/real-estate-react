@@ -35,7 +35,7 @@ const Footer = () => (
         <div className="mt-4 space-y-2.5 text-sm text-stone-500">
           <p>Tanta, El-Gharbiya, Egypt</p>
           <p>Mon – Fri, 09:00 – 18:00</p>
-          <p className="text-amber-800">support@estate.com</p>
+          <p className="text-amber-800">malek2062002@gmail.com</p>
         </div>
       </div>
     </div>
